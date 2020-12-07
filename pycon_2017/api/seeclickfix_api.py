@@ -36,6 +36,7 @@ def get_seeclickfix(page=1, pulled=0, search_params={'place_url':
 
         # create a file name that reflects which page of results it contains
         # and write that file
+        # requires the "tutorial_output" directory to exist 
         file_name = 'tutorial_output/seeclickfix%d.json' % page
         with open(file_name, 'w') as outfile:
             json.dump(data, outfile)
