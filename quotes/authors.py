@@ -8,7 +8,6 @@ class AuthorsSpider(scrapy.Spider):
     def parse(self, response):
         urls = response.css('div.quote > span > a::attr(href)').extract()
         for url in urls:
-            print('### ' + url)
             url = response.urljoin(url)
             yield scrapy.Request(url=url, callback=self.parse_details)
             
