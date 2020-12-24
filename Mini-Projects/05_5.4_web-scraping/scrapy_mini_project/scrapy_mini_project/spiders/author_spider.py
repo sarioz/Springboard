@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Author spider
+Author Spider
 """
 
 import scrapy
