@@ -7,7 +7,7 @@ client = language_v1.LanguageServiceClient()
 
 line_num = 0
 
-print("Tweet\tCurated sentiment\tG_Sentiment_Score\tG_Sentiment_Magnitude")
+print("Tweet\tCurated_Sentiment\tG_Sentiment_Score\tG_Sentiment_Magnitude")
 
 # we read input from stdin
 for line in fileinput.input():
