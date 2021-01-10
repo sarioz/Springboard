@@ -22,7 +22,7 @@ for line in fileinput.input():
 	# We don't specify language which lets Google figure it out
 	try:
 		detected_sentiment = client.analyze_sentiment(request={'document': document}).document_sentiment
-		print("{}\t{}\t{:.2f}\t{:2f}".format(tweet, provided_sentiment, detected_sentiment.score, detected_sentiment.magnitude))
+		print("{}\t{}\t{:.2f}\t{:.2f}".format(tweet, provided_sentiment, detected_sentiment.score, detected_sentiment.magnitude))
 	except:
 		print("{}\t{}\tException\tException".format(tweet, provided_sentiment))
 
