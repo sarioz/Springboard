@@ -13,7 +13,8 @@ split -l 10 neutrals.txt
 for f in x*; do mv "$f" "$f.txt"; done
 rm neutrals.txt
 cd ../2/
-split -l 10 positives.txt
+# set a higher suffix length here, otherwise caps at 676 output files
+split -a 3 -l 10 positives.txt
 for f in x*; do mv "$f" "$f.txt"; done
 rm positives.txt
 cd ../..
