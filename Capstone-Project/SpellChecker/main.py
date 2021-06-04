@@ -1,33 +1,25 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
 from loader import Loader
 from tweet_cleaner import TweetCleaner
 from noiser import DisjointNoiser
 
-from random import choice
+import random
 
-# def print_hi(name):
-#     # Use a breakpoint in the code line below to debug your script.
-#     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
 TRAINING_INPUT_PATH = '../data/lid_train_lines.txt'
 
 
 def main():
+    random.seed(42)
+
     raw_tweets = Loader(TRAINING_INPUT_PATH).load()
+    num_training_tweets = len(raw_tweets)
     cleaner = TweetCleaner()
     clean_tweets = [cleaner.clean_tweet(t) for t in raw_tweets]
 
     noiser = DisjointNoiser()
+    noisy_tweets_as_lists = [noiser.add_noise(list(t)) for t in clean_tweets]
+    noisy_tweets_readable = [''.join(t) for t in noisy_tweets_as_lists]
 
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    # print_hi('PyCharm')
     main()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
