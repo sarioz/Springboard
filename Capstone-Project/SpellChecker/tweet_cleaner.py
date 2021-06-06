@@ -2,6 +2,7 @@ import re
 
 from vocab_util import RAW_VOCAB_STR
 
+
 class TweetCleaner:
     def clean_tweet(self, tweet: str) -> str:
         # take out URLs
