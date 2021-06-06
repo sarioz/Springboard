@@ -37,7 +37,7 @@ class NNModelCreator:
 
         return model
 
-    def create_inference_model(self, training_model):
+    def create_inference_models(self, training_model):
         encoder_inputs = training_model.input[0]  # input_1
         encoder_outputs, state_h_enc, state_c_enc = training_model.layers[2].output  # lstm_1
         encoder_states = [state_h_enc, state_c_enc]
