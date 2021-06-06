@@ -16,9 +16,12 @@ def main():
     cleaner = TweetCleaner()
     clean_tweets = [cleaner.clean_tweet(t) for t in raw_tweets]
 
+
     noiser = DisjointNoiser()
     noisy_tweets_as_lists = [noiser.add_noise(list(t)) for t in clean_tweets]
     noisy_tweets_readable = [''.join(t) for t in noisy_tweets_as_lists]
+    clean_tweets_as_lists = [list(t) for t in clean_tweets]
+
 
 
 if __name__ == '__main__':

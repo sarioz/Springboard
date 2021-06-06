@@ -1,5 +1,7 @@
 import re
 
+from vocab_util import RAW_VOCAB_STR
+
 class TweetCleaner:
     def clean_tweet(self, tweet: str) -> str:
         # take out URLs
@@ -8,10 +10,9 @@ class TweetCleaner:
         tweet = re.sub("@[^\s]+", ' ', tweet)
         # take out hashtags
         tweet = re.sub("#[^\s]+", ' ', tweet)
-        # take out all characters outside of those we enumerate
-        tweet = re.sub("[^\da-zA-ZáéíóúüñÁÉÍÑÓÚÜ¿?¡!.,;#:<>()'“”\"\s]", ' ', tweet)
-        # lowercase everything
         tweet = tweet.lower()
+        # take out all characters outside of those we specify
+        tweet = re.sub("[^" + RAW_VOCAB_STR + "]", ' ', tweet)
         # reset spaces
         tweet = re.sub("\s+", ' ', tweet)
         tweet = re.sub("^\s+", '', tweet)
