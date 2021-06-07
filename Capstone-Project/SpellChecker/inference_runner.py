@@ -8,7 +8,7 @@ class InferenceRunner:
         self.encoder_model = encoder_model
         self.decoder_model = decoder_model
 
-    def decode_sequence(self, input_seq):
+    def decode_sequence(self, input_seq) -> str:
         """This function is doing a bit too much. Should break it up."""
         # Encode the input as state vectors.
         states_value = self.encoder_model.predict(input_seq)
@@ -24,7 +24,7 @@ class InferenceRunner:
         decoded_tweet = ''
         while not stop_condition:
             output_tokens, h, c = self.decoder_model.predict([target_seq] + states_value)
-
+            # print('output_tokens:', output_tokens)
             # Sample a token
             sampled_token_index = np.argmax(output_tokens[0, -1, :])
             sampled_char = NN_VOCAB_TUPLE[sampled_token_index]
