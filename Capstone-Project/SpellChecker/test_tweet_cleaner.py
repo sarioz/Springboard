@@ -2,6 +2,7 @@ import unittest
 
 from tweet_cleaner import TweetCleaner
 
+
 class TweetCleanerTest(unittest.TestCase):
 
     def test_removes_mentions(self):

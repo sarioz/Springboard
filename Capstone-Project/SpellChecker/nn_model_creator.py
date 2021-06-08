@@ -1,5 +1,5 @@
-from tensorflow.keras.layers import Dense, LSTM
 from tensorflow.keras import Input, Model
+from tensorflow.keras.layers import Dense, LSTM
 
 from vocab_util import LEN_NN_VOCAB
 

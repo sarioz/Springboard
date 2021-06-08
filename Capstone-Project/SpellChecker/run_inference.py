@@ -1,13 +1,10 @@
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+
 from data_loader import DataLoader
 from inference_runner import InferenceRunner
 from nn_input_preparer import NNInputPreparer
-
-from tensorflow.keras.models import load_model
-
 from nn_model_creator import NNModelCreator
-
-import tensorflow as tf
-
 from noiser import DisjointNoiser
 from tweet_cleaner import TweetCleaner
 

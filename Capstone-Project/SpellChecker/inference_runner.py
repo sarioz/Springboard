@@ -1,6 +1,7 @@
+import numpy as np
+
 from vocab_util import LEN_NN_VOCAB, NN_VOCAB_TO_INT, NN_VOCAB_TUPLE
 
-import numpy as np
 
 class InferenceRunner:
 

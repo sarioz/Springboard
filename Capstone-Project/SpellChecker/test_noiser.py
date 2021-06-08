@@ -1,8 +1,8 @@
+import random
 import unittest
 
 from noiser import DisjointNoiser
 
-import random
 
 class NoiserTestCase(unittest.TestCase):
 

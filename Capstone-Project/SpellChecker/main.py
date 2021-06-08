@@ -1,25 +1,29 @@
+import random
+
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+from tensorflow.keras.callbacks import ModelCheckpoint
+
 from data_loader import DataLoader
 from inference_runner import InferenceRunner
 from nn_input_preparer import NNInputPreparer
 from nn_model_creator import NNModelCreator
-from tweet_cleaner import TweetCleaner
 from noiser import DisjointNoiser
+from tweet_cleaner import TweetCleaner
 
-from tensorflow.keras.models import load_model
-from tensorflow.keras.callbacks import ModelCheckpoint
-
-import tensorflow as tf
-
-import random
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
-# TRAINING_MODEL_FILENAME = 'models/weights-improvement-4-0.87262.h5'
-# TRAINING_MODEL_FILENAME = 'models/weights-improvement-2-0.85544.h5'
-# TRAINING_MODEL_FILENAME = 'models/weights-improvement-1-0.84504.h5'
-# TRAINING_MODEL_FILENAME = 'models/weights-improvement-0-0.80569.h5'
-TRAINING_MODEL_FILENAME = 'models/trained_model.h5'
-IS_TRAINING_RUN = False
+# TRAINING_MODEL_FILENAME = 'models/dim_256/weights-improvement-4-0.87262.h5'
+# TRAINING_MODEL_FILENAME = 'models/dim_256/weights-improvement-2-0.85544.h5'
+# TRAINING_MODEL_FILENAME = 'models/dim_256/weights-improvement-1-0.84504.h5'
+# TRAINING_MODEL_FILENAME = 'models/dim_256/weights-improvement-0-0.80569.h5'
+
+LATENT_DIM = 1024
+NUM_DE_FACTO_EPOCHS = 50
+
+TRAINING_MODEL_FILENAME = f'models/dim_{LATENT_DIM}/trained_model.h5'
+IS_TRAINING_RUN = True
 
 
 def main():
@@ -34,7 +38,7 @@ def main():
     noiser = DisjointNoiser()
     clean_tweets_as_lists = [list(t) for t in clean_tweets]
 
-    model_creator = NNModelCreator()
+    model_creator = NNModelCreator(latent_dim=LATENT_DIM)
     training_model = model_creator.create_training_model()
 
     generator_batch_size = 2048
@@ -44,11 +48,11 @@ def main():
     if IS_TRAINING_RUN:
         num_generations = 0
 
-        for de_facto_epoch in range(5):
+        for de_facto_epoch in range(NUM_DE_FACTO_EPOCHS):
             gb_training = nn_input_preparer.get_batches(
                 clean_tweets_as_lists, noiser, generator_batch_size)
 
-            cp_filepath = f'models/weights-improvement-{de_facto_epoch}-' + "{val_accuracy:.5f}.h5"
+            cp_filepath = f'models/dim_{LATENT_DIM}/dfepoch_{de_facto_epoch}_' + "{val_accuracy:.5f}.h5"
             print(cp_filepath)
 
             checkpoint = ModelCheckpoint(cp_filepath, monitor='val_accuracy', verbose=1,

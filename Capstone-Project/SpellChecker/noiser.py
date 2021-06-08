@@ -2,7 +2,9 @@
 
 import random
 from typing import List
+
 from frozendict import frozendict
+
 from vocab_util import ALPHABET_TUPLE, ALPHABET_SET, DISACCENT_DICT, VOWELS_SET
 
 

@@ -1,6 +1,5 @@
-from typing import List
-
 import numpy as np
+from typing import List
 
 from noiser import DisjointNoiser
 from vocab_util import LEN_NN_VOCAB, NN_VOCAB_TO_INT, NN_VOCAB_TUPLE
