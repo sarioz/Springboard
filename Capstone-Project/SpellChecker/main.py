@@ -4,7 +4,6 @@ from nn_input_preparer import NNInputPreparer
 from nn_model_creator import NNModelCreator
 from tweet_cleaner import TweetCleaner
 from noiser import DisjointNoiser
-from vocab_util import NN_VOCAB_TO_INT
 
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -15,6 +14,13 @@ import random
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
+# TRAINING_MODEL_FILENAME = 'models/weights-improvement-4-0.87262.h5'
+# TRAINING_MODEL_FILENAME = 'models/weights-improvement-2-0.85544.h5'
+# TRAINING_MODEL_FILENAME = 'models/weights-improvement-1-0.84504.h5'
+# TRAINING_MODEL_FILENAME = 'models/weights-improvement-0-0.80569.h5'
+TRAINING_MODEL_FILENAME = 'models/trained_model.h5'
+IS_TRAINING_RUN = False
+
 
 def main():
     print('tf:', tf.__version__)
@@ -22,30 +28,25 @@ def main():
     random.seed(42)
 
     raw_tweets = DataLoader(TRAINING_INPUT_FILENAME).load()
-    num_training_tweets = len(raw_tweets)
     cleaner = TweetCleaner()
     clean_tweets = [cleaner.clean_tweet(t) for t in raw_tweets]
 
     noiser = DisjointNoiser()
-    noisy_tweets_as_lists = [noiser.add_noise(list(t)) for t in clean_tweets]
-    noisy_tweets_readable = [''.join(t) for t in noisy_tweets_as_lists]
     clean_tweets_as_lists = [list(t) for t in clean_tweets]
 
     model_creator = NNModelCreator()
     training_model = model_creator.create_training_model()
 
-    GENERATOR_BATCH_SIZE = 2048
+    generator_batch_size = 2048
 
     nn_input_preparer = NNInputPreparer()
-    TRAINING_MODEL_FILENAME = 'models/weights-improvement-4-0.87262.h5'
 
-    IS_TRAINING_RUN = False
     if IS_TRAINING_RUN:
         num_generations = 0
 
         for de_facto_epoch in range(5):
             gb_training = nn_input_preparer.get_batches(
-                clean_tweets_as_lists, noiser, GENERATOR_BATCH_SIZE)
+                clean_tweets_as_lists, noiser, generator_batch_size)
 
             cp_filepath = f'models/weights-improvement-{de_facto_epoch}-' + "{val_accuracy:.5f}.h5"
             print(cp_filepath)
@@ -56,21 +57,21 @@ def main():
             while True:
                 try:
                     noised_batch, originals_batch, originals_delayed_batch = next(gb_training)
-                    assert (len(noised_batch) == GENERATOR_BATCH_SIZE)
+                    assert (len(noised_batch) == generator_batch_size)
                     print(noised_batch.shape, originals_batch.shape,
                           originals_delayed_batch.shape)
-                    VALIDATION_SPLIT = 0.125
-                    FIT_BATCH_SIZE = 32
+                    validation_split = 0.125
+                    fit_batch_size = 32
                     # We take care here so as not to manifest the "Your input ran out of data" warning
-                    VALIDATION_STEPS = int(GENERATOR_BATCH_SIZE * VALIDATION_SPLIT) // FIT_BATCH_SIZE
-                    TRAINING_STEPS = GENERATOR_BATCH_SIZE // FIT_BATCH_SIZE - VALIDATION_STEPS
+                    validation_steps = int(generator_batch_size * validation_split) // fit_batch_size
+                    training_steps = generator_batch_size // fit_batch_size - validation_steps
                     training_model.fit([noised_batch, originals_delayed_batch],
                                        originals_batch,
-                                       batch_size=FIT_BATCH_SIZE,
-                                       steps_per_epoch=TRAINING_STEPS,
+                                       batch_size=fit_batch_size,
+                                       steps_per_epoch=training_steps,
                                        epochs=1,
-                                       validation_split=VALIDATION_SPLIT,
-                                       validation_steps=VALIDATION_STEPS,
+                                       validation_split=validation_split,
+                                       validation_steps=validation_steps,
                                        callbacks=[checkpoint])
                     # https://keras.io/api/models/model_training_apis/ says:
                     # "The validation data is selected from the last samples in the ... data provided"
@@ -99,6 +100,7 @@ def main():
         decoded_tweet = inference_runner.decode_sequence(noised_batch)
         print('[decoded   ]', decoded_tweet)
         print()
+
 
 if __name__ == '__main__':
     main()
