@@ -10,8 +10,10 @@ from tweet_cleaner import TweetCleaner
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
-TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_2_0.87041.h5'
-
+# TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_2_0.87041.h5'
+# TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_5_0.88632.h5'
+# TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_10_0.88389.h5'
+TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_18_0.88577.h5'
 LATENT_DIM = 1024
 
 def main():
