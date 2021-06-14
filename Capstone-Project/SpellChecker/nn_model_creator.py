@@ -8,7 +8,8 @@ class NNModelCreator:
     def __init__(self, latent_dim=256):
         self.latent_dim = latent_dim
 
-    def create_training_model(self):
+    def create_chollet_training_model(self) -> Model:
+        """Create training model according to Chollet's https://keras.io/examples/nlp/lstm_seq2seq/"""
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None, LEN_NN_VOCAB))
         encoder = LSTM(self.latent_dim, return_state=True)
@@ -37,7 +38,9 @@ class NNModelCreator:
 
         return model
 
-    def create_inference_models(self, training_model):
+
+    def create_chollet_inference_models(self, training_model: Model) -> Model:
+        """Create inference models according to Chollet's https://keras.io/examples/nlp/lstm_seq2seq/"""
         encoder_inputs = training_model.input[0]  # input_1
         encoder_outputs, state_h_enc, state_c_enc = training_model.layers[2].output  # lstm_1
         encoder_states = [state_h_enc, state_c_enc]
@@ -59,3 +62,10 @@ class NNModelCreator:
         )
 
         return encoder_model, decoder_model
+
+
+    def create_training_model(self) -> Model:
+        return self.create_chollet_training_model()
+
+    def create_inference_models(self, training_model: Model) -> Model:
+        return self.create_chollet_inference_models(training_model)

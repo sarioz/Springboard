@@ -34,7 +34,6 @@ class NNInputPreparer:
             start_i = batch_i * batch_size
 
             tweets_batch = tweets[start_i:start_i + batch_size]
-            # print('get_batches, tweets_batch[0]==', tweets_batch)
 
             tweets_batch_noised = [noiser.add_noise(tweet) for tweet in tweets_batch]
 
@@ -59,20 +58,9 @@ class NNInputPreparer:
                 tweets_batch_noised_eot,
                 max([len(tweet) for tweet in tweets_batch_noised_eot])))
 
-            # print("padded_tweets_batch:", padded_tweets_batch)
-            # print("padded_tweets_delayed_batch:", padded_tweets_delayed_batch)
-            # print("padded_tweets_noised_batch:", padded_tweets_noised_batch)
-
             padded_tweets_noised_encoded_batch = self.one_hot_encode(padded_tweets_noised_batch)
             padded_tweets_encoded_batch = self.one_hot_encode(padded_tweets_batch)
             padded_tweets_delayed_encoded_batch = self.one_hot_encode(padded_tweets_delayed_batch)
-
-            # print('padded_tweets_noised_encoded_batch:',
-            #       self.decode_batch(padded_tweets_noised_encoded_batch))
-            # print('padded_tweets_encoded_batch:',
-            #       self.decode_batch(padded_tweets_encoded_batch))
-            # print('padded_tweets_delayed_encoded_batch:',
-            #       self.decode_batch(padded_tweets_delayed_encoded_batch))
 
             yield (padded_tweets_noised_encoded_batch, padded_tweets_encoded_batch,
                    padded_tweets_delayed_encoded_batch)
