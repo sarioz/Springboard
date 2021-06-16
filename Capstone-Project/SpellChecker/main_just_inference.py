@@ -10,14 +10,15 @@ from tweet_cleaner import TweetCleaner
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
-# TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_2_0.87041.h5'
-# TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_5_0.88632.h5'
-# TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_10_0.88389.h5'
-TRAINING_MODEL_FILENAME = 'models/dim_1024_dfepoch_18_0.88577.h5'
-LATENT_DIM = 1024
+EXPERIMENT_NAME = "4_LSTMs"
+
+LATENT_DIM = 512
+
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/dfepoch_19_0.88065.h5'
 
 def main():
     print('tf:', tf.__version__)
+    print('TRAINING_MODEL_FILENAME =', TRAINING_MODEL_FILENAME)
 
     raw_tweets = DataLoader(TRAINING_INPUT_FILENAME).load()
     cleaner = TweetCleaner()

@@ -38,7 +38,6 @@ class NNModelCreator:
 
         return model
 
-
     def create_chollet_inference_models(self, training_model: Model) -> (Model, Model):
         """Create inference models according to Chollet's https://keras.io/examples/nlp/lstm_seq2seq/"""
         encoder_inputs = training_model.input[0]  # input_1
@@ -63,9 +62,84 @@ class NNModelCreator:
 
         return encoder_model, decoder_model
 
+    def create_4_lstm_training_model(self) -> Model:
+        # Define an input sequence and process it.
+        encoder_inputs = Input(shape=(None, LEN_NN_VOCAB), name="encoder_inputs")
+        encoder_layer_1 = LSTM(self.latent_dim, return_sequences=True, name="encoder_layer_1")
+        encoder_layer_1_outputs = encoder_layer_1(encoder_inputs)
+        encoder_layer_2 = LSTM(self.latent_dim, return_state=True, name="encoder_layer_2")
+        encoder_last_layer_outputs, state_h, state_c = encoder_layer_2(encoder_layer_1_outputs)
+
+        # We discard `encoder_outputs` and only keep the states.
+        encoder_last_layer_states = [state_h, state_c]
+
+        # Set up the decoder, using `encoder_last_layer_states` as initial state.
+        decoder_inputs = Input(shape=(None, LEN_NN_VOCAB), name="decoder_inputs")
+
+        # We set up our decoder to return full output sequences,
+        # and to return internal states as well. We don't use the
+        # return states in the training model, but we will use them in inference.
+        decoder_layer_1 = LSTM(self.latent_dim, return_sequences=True, return_state=True, name="decoder_layer_1")
+        decoder_layer_1_outputs, _, _ = decoder_layer_1(decoder_inputs, initial_state=encoder_last_layer_states)
+        decoder_layer_2 = LSTM(self.latent_dim, return_sequences=True, return_state=True, name="decoder_layer_2")
+        decoder_layer_2_outputs, _, _ = decoder_layer_2(decoder_layer_1_outputs)
+
+        decoder_dense = Dense(LEN_NN_VOCAB, activation="softmax", name="decoder_dense")
+        decoder_outputs = decoder_dense(decoder_layer_2_outputs)
+
+        # Define the model that will turn
+        # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+        model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+        model.compile(
+            optimizer="rmsprop", loss="categorical_crossentropy", metrics=["accuracy"]
+        )
+
+        print('training_model:', model.summary())
+        print()
+
+        return model
+
+    def create_4_lstm_inference_models(self, training_model: Model) -> (Model, Model):
+        encoder_inputs = training_model.input[0]
+        _, state_h_enc, state_c_enc = training_model.get_layer(name="encoder_layer_2").output
+        encoder_states = [state_h_enc, state_c_enc]
+        encoder_model = Model(encoder_inputs, encoder_states)
+
+        decoder_inputs = training_model.input[1]
+        decoder_state_input_h = Input(shape=(self.latent_dim,), name="decoder_state_input_h")
+        decoder_state_input_c = Input(shape=(self.latent_dim,), name="decoder_state_input_c")
+        decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+        decoder_lstm_1 = training_model.get_layer("decoder_layer_1")
+        decoder_lstm_1_outputs, _, _ = decoder_lstm_1(
+            decoder_inputs, initial_state=decoder_states_inputs
+        )
+        decoder_lstm_2 = training_model.get_layer("decoder_layer_2")
+        decoder_outputs, state_h_dec, state_c_dec = decoder_lstm_2(
+            decoder_lstm_1_outputs
+        )
+        decoder_states = [state_h_dec, state_c_dec]
+        decoder_dense = training_model.get_layer("decoder_dense")
+        decoder_outputs = decoder_dense(decoder_outputs)
+        decoder_model = Model(
+            [decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states
+        )
+
+        return encoder_model, decoder_model
 
     def create_training_model(self) -> Model:
-        return self.create_chollet_training_model()
+        m = self.create_4_lstm_training_model()
+        print('training model:')
+        m.summary()
+
+        return m
 
     def create_inference_models(self, training_model: Model) -> (Model, Model):
-        return self.create_chollet_inference_models(training_model)
+        print('loaded training_model:')
+        training_model.summary()
+        encoder_model, decoder_model = self.create_4_lstm_inference_models(training_model)
+        print('derived encoder_model:')
+        encoder_model.summary()
+        print('derived decoder_model:')
+        decoder_model.summary()
+
+        return encoder_model, decoder_model
