@@ -19,7 +19,7 @@ TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 # TRAINING_MODEL_FILENAME = 'models/dim_256/weights-improvement-1-0.84504.h5'
 # TRAINING_MODEL_FILENAME = 'models/dim_256/weights-improvement-0-0.80569.h5'
 
-LATENT_DIM = 1024
+LATENT_DIM = 512
 NUM_DE_FACTO_EPOCHS = 50
 
 TRAINING_MODEL_FILENAME = f'models/dim_{LATENT_DIM}/trained_model.h5'
