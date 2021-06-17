@@ -14,7 +14,8 @@ EXPERIMENT_NAME = '03.BiLSTMs'
 
 LATENT_DIM = 512
 
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/dfepoch_0_0.70630.h5'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/dfepoch_1_0.87239.h5'
+
 
 def main():
     print('tf:', tf.__version__)
