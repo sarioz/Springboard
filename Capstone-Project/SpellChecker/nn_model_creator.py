@@ -180,7 +180,6 @@ class NNModelCreator:
 
         return encoder_model, decoder_model
 
-
     def create_training_model(self) -> Model:
         m = self.create_bilstm_training_model()
         print('training model:')

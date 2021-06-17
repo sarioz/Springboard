@@ -10,7 +10,6 @@ from nn_model_creator import NNModelCreator
 from noiser import DisjointNoiser
 from tweet_cleaner import TweetCleaner
 
-
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
 EXPERIMENT_NAME = "03.BiLSTMs"
@@ -88,6 +87,7 @@ def main():
         training_model.save(BASE_DIR + f'dfepoch_{de_facto_epoch}_end.h5')
 
     training_model.save(TRAINING_MODEL_FILENAME)
+
 
 if __name__ == '__main__':
     main()
