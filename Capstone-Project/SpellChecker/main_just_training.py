@@ -1,4 +1,5 @@
 import random
+import time
 
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -12,10 +13,10 @@ from tweet_cleaner import TweetCleaner
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
-EXPERIMENT_NAME = "4_LSTMs"
+EXPERIMENT_NAME = "03.BiLSTMs"
 
 LATENT_DIM = 512
-NUM_DE_FACTO_EPOCHS = 20
+NUM_DE_FACTO_EPOCHS = 50
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/'
 TRAINING_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
@@ -41,6 +42,8 @@ def main():
     nn_input_preparer = NNInputPreparer()
 
     num_generations = 0
+
+    print(time.ctime())
 
     for de_facto_epoch in range(NUM_DE_FACTO_EPOCHS):
         gb_training = nn_input_preparer.get_batches(
@@ -75,14 +78,16 @@ def main():
                 # "The validation data is selected from the last samples in the ... data provided"
                 # This means the model is never validated on tweets that we train it on.
             except StopIteration:
-                print('StopIteration')
                 break
 
             num_generations += 1
-            print(num_generations)
+            print(f'num_generations: {num_generations}')
+
+        print(time.ctime())
+        print(f'End of de facto epoch {de_facto_epoch} - saving model')
+        training_model.save(BASE_DIR + f'dfepoch_{de_facto_epoch}_end.h5')
 
     training_model.save(TRAINING_MODEL_FILENAME)
-
 
 if __name__ == '__main__':
     main()

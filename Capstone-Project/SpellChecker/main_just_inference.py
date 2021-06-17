@@ -10,11 +10,11 @@ from tweet_cleaner import TweetCleaner
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
-EXPERIMENT_NAME = "4_LSTMs"
+EXPERIMENT_NAME = '03.BiLSTMs'
 
 LATENT_DIM = 512
 
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/dfepoch_19_0.88065.h5'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/dfepoch_0_0.70630.h5'
 
 def main():
     print('tf:', tf.__version__)
@@ -31,7 +31,7 @@ def main():
     model_creator = NNModelCreator(latent_dim=LATENT_DIM)
     loaded_training_model = load_model(TRAINING_MODEL_FILENAME)
 
-    encoder_model, decoder_model = model_creator.create_inference_models(loaded_training_model)
+    encoder_model, decoder_model = model_creator.derive_inference_models(loaded_training_model)
     inference_runner = InferenceRunner(encoder_model=encoder_model, decoder_model=decoder_model)
 
     gb_inference = nn_input_preparer.get_batches(clean_tweets_as_lists, noiser, batch_size=1)

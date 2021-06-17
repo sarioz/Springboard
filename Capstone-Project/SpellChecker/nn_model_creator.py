@@ -1,5 +1,5 @@
 from tensorflow.keras import Input, Model
-from tensorflow.keras.layers import Dense, LSTM
+from tensorflow.keras.layers import Bidirectional, Concatenate, Dense, LSTM
 
 from vocab_util import LEN_NN_VOCAB
 
@@ -38,7 +38,7 @@ class NNModelCreator:
 
         return model
 
-    def create_chollet_inference_models(self, training_model: Model) -> (Model, Model):
+    def derive_chollet_inference_models(self, training_model: Model) -> (Model, Model):
         """Create inference models according to Chollet's https://keras.io/examples/nlp/lstm_seq2seq/"""
         encoder_inputs = training_model.input[0]  # input_1
         encoder_outputs, state_h_enc, state_c_enc = training_model.layers[2].output  # lstm_1
@@ -99,7 +99,7 @@ class NNModelCreator:
 
         return model
 
-    def create_4_lstm_inference_models(self, training_model: Model) -> (Model, Model):
+    def derive_4_lstm_inference_models(self, training_model: Model) -> (Model, Model):
         encoder_inputs = training_model.input[0]
         _, state_h_enc, state_c_enc = training_model.get_layer(name="encoder_layer_2").output
         encoder_states = [state_h_enc, state_c_enc]
@@ -126,17 +126,72 @@ class NNModelCreator:
 
         return encoder_model, decoder_model
 
+    def create_bilstm_training_model(self) -> Model:
+        # Define an input sequence and process it.
+        encoder_inputs = Input(shape=(None, LEN_NN_VOCAB))
+        encoder = Bidirectional(LSTM(self.latent_dim, return_state=True), name="encoder_bilstm")
+        _, forward_h, forward_c, backward_h, backward_c = encoder(encoder_inputs)
+        state_h = Concatenate()([forward_h, backward_h])
+        state_c = Concatenate()([forward_c, backward_c])
+        encoder_states = [state_h, state_c]
+
+        # Set up the decoder, using `encoder_states` as initial state.
+        decoder_inputs = Input(shape=(None, LEN_NN_VOCAB))
+
+        # We set up our decoder to return full output sequences,
+        # and to return internal states as well. We don't use the
+        # return states in the training model, but we will use them in inference.
+        decoder_lstm = LSTM(self.latent_dim * 2, return_sequences=True, return_state=True, name="decoder_lstm")
+        decoder_outputs, _, _ = decoder_lstm(decoder_inputs, initial_state=encoder_states)
+        decoder_dense = Dense(LEN_NN_VOCAB, activation="softmax", name="decoder_dense")
+        decoder_outputs = decoder_dense(decoder_outputs)
+
+        # Define the model that will turn
+        # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+        model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+        model.compile(
+            optimizer="rmsprop", loss="categorical_crossentropy", metrics=["accuracy"]
+        )
+
+        return model
+
+    def derive_bilstm_inference_models(self, training_model: Model) -> (Model, Model):
+        encoder_inputs = training_model.input[0]
+        _, forward_h, forward_c, backward_h, backward_c = training_model.get_layer(name="encoder_bilstm").output
+        state_h_enc = Concatenate()([forward_h, backward_h])
+        state_c_enc = Concatenate()([forward_c, backward_c])
+        encoder_states = [state_h_enc, state_c_enc]
+        encoder_model = Model(encoder_inputs, encoder_states)
+
+        decoder_inputs = training_model.input[1]
+        decoder_state_input_h = Input(shape=(self.latent_dim * 2,), name="decoder_state_input_h")
+        decoder_state_input_c = Input(shape=(self.latent_dim * 2,), name="decoder_state_input_c")
+        decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+        decoder_lstm = training_model.get_layer("decoder_lstm")
+        decoder_outputs, state_h_dec, state_c_dec = decoder_lstm(
+            decoder_inputs, initial_state=decoder_states_inputs
+        )
+        decoder_states = [state_h_dec, state_c_dec]
+        decoder_dense = training_model.get_layer(name="decoder_dense")
+        decoder_outputs = decoder_dense(decoder_outputs)
+        decoder_model = Model(
+            [decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states
+        )
+
+        return encoder_model, decoder_model
+
+
     def create_training_model(self) -> Model:
-        m = self.create_4_lstm_training_model()
+        m = self.create_bilstm_training_model()
         print('training model:')
         m.summary()
 
         return m
 
-    def create_inference_models(self, training_model: Model) -> (Model, Model):
+    def derive_inference_models(self, training_model: Model) -> (Model, Model):
         print('loaded training_model:')
         training_model.summary()
-        encoder_model, decoder_model = self.create_4_lstm_inference_models(training_model)
+        encoder_model, decoder_model = self.derive_bilstm_inference_models(training_model)
         print('derived encoder_model:')
         encoder_model.summary()
         print('derived decoder_model:')
