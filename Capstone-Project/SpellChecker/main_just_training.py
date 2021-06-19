@@ -3,6 +3,7 @@ import time
 
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
 
 from data_loader import DataLoader
 from nn_input_preparer import NNInputPreparer
@@ -12,13 +13,18 @@ from tweet_cleaner import TweetCleaner
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
-EXPERIMENT_NAME = "03.BiLSTMs"
+EXPERIMENT_NAME = "04.BiLSTMs_2_Dense"
 
 LATENT_DIM = 512
 NUM_DE_FACTO_EPOCHS = 50
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/'
-TRAINING_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
+FINAL_TRAINED_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
+
+CONTINUE_TRAINING = True
+INITIALLY_COMPLETED_DFEPOCH = 11 if CONTINUE_TRAINING else -1
+
+TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + f'dfepoch_{INITIALLY_COMPLETED_DFEPOCH}_end.h5'
 
 
 def main():
@@ -33,8 +39,11 @@ def main():
     noiser = DisjointNoiser()
     clean_tweets_as_lists = [list(t) for t in clean_tweets]
 
-    model_creator = NNModelCreator(latent_dim=LATENT_DIM)
-    training_model = model_creator.create_training_model()
+    if CONTINUE_TRAINING:
+        training_model = load_model(TRAINING_MODEL_FILENAME_TO_CONTINUE)
+    else:
+        model_creator = NNModelCreator(latent_dim=LATENT_DIM)
+        training_model = model_creator.create_training_model()
 
     generator_batch_size = 2048
 
@@ -44,12 +53,11 @@ def main():
 
     print(time.ctime())
 
-    for de_facto_epoch in range(NUM_DE_FACTO_EPOCHS):
+    for de_facto_epoch in range(INITIALLY_COMPLETED_DFEPOCH + 1, NUM_DE_FACTO_EPOCHS):
         gb_training = nn_input_preparer.get_batches(
             clean_tweets_as_lists, noiser, generator_batch_size)
 
         cp_filepath = BASE_DIR + f'dfepoch_{de_facto_epoch}_' + "{val_accuracy:.5f}.h5"
-        print(cp_filepath)
 
         checkpoint = ModelCheckpoint(cp_filepath, monitor='val_accuracy', verbose=1,
                                      save_best_only=True, mode='max')
@@ -84,9 +92,10 @@ def main():
 
         print(time.ctime())
         print(f'End of de facto epoch {de_facto_epoch} - saving model')
+
         training_model.save(BASE_DIR + f'dfepoch_{de_facto_epoch}_end.h5')
 
-    training_model.save(TRAINING_MODEL_FILENAME)
+    training_model.save(FINAL_TRAINED_MODEL_FILENAME)
 
 
 if __name__ == '__main__':
