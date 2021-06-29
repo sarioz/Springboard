@@ -185,8 +185,8 @@ class NNModelCreator:
         encoder_inputs = Input(shape=(None, LEN_NN_VOCAB))
         encoder = Bidirectional(LSTM(self.latent_dim, return_state=True), name="encoder_bilstm")
         _, forward_h, forward_c, backward_h, backward_c = encoder(encoder_inputs)
-        state_h = Concatenate()([forward_h, backward_h])
-        state_c = Concatenate()([forward_c, backward_c])
+        state_h = Concatenate(name="concatenate_1")([forward_h, backward_h])
+        state_c = Concatenate(name="concatenate_2")([forward_c, backward_c])
         encoder_states = [state_h, state_c]
 
         # Set up the decoder, using `encoder_states` as initial state.
@@ -211,11 +211,11 @@ class NNModelCreator:
 
         return model
 
-    def create_bilstm_2dense_inference_models(self, training_model: Model) -> (Model, Model):
+    def derive_bilstm_2dense_inference_models(self, training_model: Model) -> (Model, Model):
         encoder_inputs = training_model.input[0]
         _, forward_h, forward_c, backward_h, backward_c = training_model.get_layer(name="encoder_bilstm").output
-        state_h_enc = Concatenate()([forward_h, backward_h])
-        state_c_enc = Concatenate()([forward_c, backward_c])
+        state_h_enc = Concatenate(name="concatenate_1")([forward_h, backward_h])
+        state_c_enc = Concatenate(name="concatenate_2")([forward_c, backward_c])
         encoder_states = [state_h_enc, state_c_enc]
         encoder_model = Model(encoder_inputs, encoder_states)
 
@@ -249,7 +249,7 @@ class NNModelCreator:
     def derive_inference_models(self, training_model: Model) -> (Model, Model):
         print('loaded training_model:')
         training_model.summary()
-        encoder_model, decoder_model = self.create_bilstm_2dense_inference_models(training_model)
+        encoder_model, decoder_model = self.derive_bilstm_2dense_inference_models(training_model)
         print('derived encoder_model:')
         encoder_model.summary()
         print('derived decoder_model:')
