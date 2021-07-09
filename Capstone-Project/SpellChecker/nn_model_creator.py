@@ -5,8 +5,9 @@ from vocab_util import LEN_NN_VOCAB
 
 
 class NNModelCreator:
-    def __init__(self, latent_dim=256):
+    def __init__(self, latent_dim=256, dense_dim=64):
         self.latent_dim = latent_dim
+        self.dense_dim = dense_dim
 
     def create_chollet_training_model(self) -> Model:
         """Create training model according to Chollet's https://keras.io/examples/nlp/lstm_seq2seq/"""
@@ -30,7 +31,7 @@ class NNModelCreator:
         decoder_outputs = decoder_dense(decoder_outputs)
 
         # Define the model that will turn
-        # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+        # `encoder_input_data` & `decoder_input_data` into `decoder_outputs`
         model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
         model.compile(
             optimizer="rmsprop", loss="categorical_crossentropy", metrics=["accuracy"]
@@ -197,7 +198,7 @@ class NNModelCreator:
         # return states in the training model, but we will use them in inference.
         decoder_lstm = LSTM(self.latent_dim * 2, return_sequences=True, return_state=True, name="decoder_lstm")
         decoder_outputs, _, _ = decoder_lstm(decoder_inputs, initial_state=encoder_states)
-        decoder_dense_1 = Dense(LEN_NN_VOCAB, activation="tanh", name="decoder_dense_1")
+        decoder_dense_1 = Dense(self.dense_dim, activation="tanh", name="decoder_dense_1")
         decoder_outputs = decoder_dense_1(decoder_outputs)
         decoder_dense_2 = Dense(LEN_NN_VOCAB, activation="softmax", name="decoder_dense_2")
         decoder_outputs = decoder_dense_2(decoder_outputs)
