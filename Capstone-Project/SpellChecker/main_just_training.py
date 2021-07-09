@@ -10,21 +10,28 @@ from nn_input_preparer import NNInputPreparer
 from nn_model_creator import NNModelCreator
 from noiser import DisjointNoiser
 from tweet_cleaner import TweetCleaner
+from tweet_selector import TweetSelector
 
 TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
-EXPERIMENT_NAME = "04.BiLSTMs_2_Dense"
+MIN_TWEET_LENGTH = 10
+MAX_TWEET_LENGTH = 80
+
+EXPERIMENT_NAME = f'06.sel_{MIN_TWEET_LENGTH}-{MAX_TWEET_LENGTH}_BiLSTMs_2_Dense_2'
 
 LATENT_DIM = 512
 NUM_DE_FACTO_EPOCHS = 50
+DENSE_DIM = 256
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/'
 FINAL_TRAINED_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
 
-CONTINUE_TRAINING = True
-INITIALLY_COMPLETED_DFEPOCH = 11 if CONTINUE_TRAINING else -1
+CONTINUE_TRAINING = False
+INITIALLY_COMPLETED_DFEPOCH = 8 if CONTINUE_TRAINING else -1
 
 TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + f'dfepoch_{INITIALLY_COMPLETED_DFEPOCH}_end.h5'
+
+GENERATOR_BATCH_SIZE = 512
 
 
 def main():
@@ -36,26 +43,27 @@ def main():
     cleaner = TweetCleaner()
     clean_tweets = [cleaner.clean_tweet(t) for t in raw_tweets]
 
-    noiser = DisjointNoiser()
     clean_tweets_as_lists = [list(t) for t in clean_tweets]
+    print('number of clean_tweets_as_lists:', len(clean_tweets_as_lists))
+    selector = TweetSelector(min_length=MIN_TWEET_LENGTH, max_length=MAX_TWEET_LENGTH)
+    selected_tweets_as_lists = [t for t in clean_tweets_as_lists if selector.select(t)]
+    print('number of selected_tweets_as_lists:', len(selected_tweets_as_lists))
 
     if CONTINUE_TRAINING:
         training_model = load_model(TRAINING_MODEL_FILENAME_TO_CONTINUE)
     else:
-        model_creator = NNModelCreator(latent_dim=LATENT_DIM)
+        model_creator = NNModelCreator(latent_dim=LATENT_DIM, dense_dim=DENSE_DIM)
         training_model = model_creator.create_training_model()
-
-    generator_batch_size = 2048
 
     nn_input_preparer = NNInputPreparer()
 
-    num_generations = 0
+    num_generations_in_run = 0
 
     print(time.ctime())
 
+    noiser = DisjointNoiser()
     for de_facto_epoch in range(INITIALLY_COMPLETED_DFEPOCH + 1, NUM_DE_FACTO_EPOCHS):
-        gb_training = nn_input_preparer.get_batches(
-            clean_tweets_as_lists, noiser, generator_batch_size)
+        gb_training = nn_input_preparer.get_batches(selected_tweets_as_lists, noiser, GENERATOR_BATCH_SIZE)
 
         cp_filepath = BASE_DIR + f'dfepoch_{de_facto_epoch}_' + "{val_accuracy:.5f}.h5"
 
@@ -65,14 +73,14 @@ def main():
         while True:
             try:
                 noised_batch, originals_batch, originals_delayed_batch = next(gb_training)
-                assert (len(noised_batch) == generator_batch_size)
+                assert (len(noised_batch) == GENERATOR_BATCH_SIZE)
                 print(noised_batch.shape, originals_batch.shape,
                       originals_delayed_batch.shape)
                 validation_split = 0.125
                 fit_batch_size = 32
                 # We take care here so as not to manifest the "Your input ran out of data" warning
-                validation_steps = int(generator_batch_size * validation_split) // fit_batch_size
-                training_steps = generator_batch_size // fit_batch_size - validation_steps
+                validation_steps = int(GENERATOR_BATCH_SIZE * validation_split) // fit_batch_size
+                training_steps = GENERATOR_BATCH_SIZE // fit_batch_size - validation_steps
                 training_model.fit([noised_batch, originals_delayed_batch],
                                    originals_batch,
                                    batch_size=fit_batch_size,
@@ -87,8 +95,8 @@ def main():
             except StopIteration:
                 break
 
-            num_generations += 1
-            print(f'num_generations: {num_generations}')
+            num_generations_in_run += 1
+            print(f'num_generations: {num_generations_in_run}')
 
         print(time.ctime())
         print(f'End of de facto epoch {de_facto_epoch} - saving model')
