@@ -9,18 +9,20 @@ from noiser import DisjointNoiser
 from tweet_cleaner import TweetCleaner
 from tweet_selector import TweetSelector
 
-TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
-DEV_INPUT_FILENAME = '../data/lid_dev_lines.txt'
 
+# preprocessing params
+MIN_TWEET_LENGTH = 10
+MAX_TWEET_LENGTH = 50
+
+# architectural params
 LATENT_DIM = 512
 DENSE_DIM = 256
 
-MIN_TWEET_LENGTH = 10
-MAX_TWEET_LENGTH = 80
-
-EXPERIMENT_NAME = f'06.sel_{MIN_TWEET_LENGTH}-{MAX_TWEET_LENGTH}_BiLSTMs_2_Dense_2'
-
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/dfepoch_18_end.h5'
+# file paths
+TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
+DEV_INPUT_FILENAME = '../data/lid_dev_lines.txt'
+EXPERIMENT_NAME = f'07.sel_{MIN_TWEET_LENGTH}-{MAX_TWEET_LENGTH}_BiLSTMs_2_Dense_2'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/dfepoch_49_end.h5'
 
 
 def main():
@@ -51,7 +53,7 @@ def main():
             noised_batch, originals_batch, original_delayed_batch = next(gb_inference)
             print('[noised    ]', nn_input_preparer.decode_tweet(noised_batch[0]))
             print('[original  ]', nn_input_preparer.decode_tweet(originals_batch[0]))
-            print('[original 2]', ''.join(clean_tweets_as_lists[i]))
+            print('[original 2]', ''.join(selected_tweets_as_lists[i]))
             print('[or-delayed]', nn_input_preparer.decode_tweet(original_delayed_batch[0]))
             decoded_tweet = inference_runner.decode_sequence(noised_batch)
             print('[decoded   ]', decoded_tweet)

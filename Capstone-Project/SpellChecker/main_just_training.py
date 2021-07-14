@@ -12,26 +12,23 @@ from noiser import DisjointNoiser
 from tweet_cleaner import TweetCleaner
 from tweet_selector import TweetSelector
 
-TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
-
+# preprocessing params
 MIN_TWEET_LENGTH = 10
-MAX_TWEET_LENGTH = 80
-
-EXPERIMENT_NAME = f'06.sel_{MIN_TWEET_LENGTH}-{MAX_TWEET_LENGTH}_BiLSTMs_2_Dense_2'
-
+MAX_TWEET_LENGTH = 50
+# architectural params
 LATENT_DIM = 512
-NUM_DE_FACTO_EPOCHS = 50
 DENSE_DIM = 256
-
+# training params
+GENERATOR_BATCH_SIZE = 512
+NUM_DE_FACTO_EPOCHS = 50
+CONTINUE_TRAINING = True
+INITIALLY_COMPLETED_DFEPOCH = 24 if CONTINUE_TRAINING else -1
+# file paths
+EXPERIMENT_NAME = f'07.sel_{MIN_TWEET_LENGTH}-{MAX_TWEET_LENGTH}_BiLSTMs_2_Dense_2'
 BASE_DIR = f'models/{EXPERIMENT_NAME}/dim_{LATENT_DIM}/'
 FINAL_TRAINED_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
-
-CONTINUE_TRAINING = False
-INITIALLY_COMPLETED_DFEPOCH = 8 if CONTINUE_TRAINING else -1
-
 TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + f'dfepoch_{INITIALLY_COMPLETED_DFEPOCH}_end.h5'
-
-GENERATOR_BATCH_SIZE = 512
+TRAINING_INPUT_FILENAME = '../data/lid_train_lines.txt'
 
 
 def main():
