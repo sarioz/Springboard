@@ -11,7 +11,7 @@ class LstmModelCreator:
         self.embedding_dim = embedding_dim
         self.lstm_dim = lstm_dim
 
-    def create_lstm_model(self) -> tf.keras.Model:
+    def create_uni_lstm_model(self) -> tf.keras.Model:
         model = keras.Sequential(
             layers=[
                 layers.Embedding(input_dim=self.vu.get_input_vocab_size(),
@@ -21,11 +21,9 @@ class LstmModelCreator:
             ],
             name="sequential_lstm_model"
         )
-
         model.summary()
 
         opt = tf.keras.optimizers.SGD(learning_rate=0.1, momentum=0.9)
-
         model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["accuracy"])
 
         return model

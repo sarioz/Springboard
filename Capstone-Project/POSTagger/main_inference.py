@@ -1,25 +1,21 @@
 import numpy as np
 import tensorflow as tf
-
 from tensorflow.keras.models import load_model
 
 from labeled_data_loader import LabeledDataLoader
-from model_creator import LstmModelCreator
 from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
-BASE_DIR = f'models/01_uni_LSTM_masked_a_bigeta/'
 
-MAX_EPOCHS = 50
-
-EXPERIMENT_NAME = '01_uni_LSTM_masked_a_bigeta_oov'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/1_0.26053.h5'
+EXPERIMENT_NAME = '01_uni_LSTM_masked_a_bigeta_oov_128_256'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/49_0.90931.h5'
 
 TRAINING_INPUT_FILENAME = '../data/pos/train.conll'
 DEV_INPUT_FILENAME = '../data/pos/dev.conll'
 
 
 def main_inference():
+    print(f'Using TensorFlow version {tf.__version__}')
     print(f'Loading model {TRAINING_MODEL_FILENAME}')
     loaded_training_model = load_model(TRAINING_MODEL_FILENAME)
 
@@ -51,6 +47,7 @@ def main_inference():
         for rectangular_input, rectangular_target in zip(rectangular_inputs, rectangular_targets):
             tokens_human = [vu.nn_input_tokens[i] for i in rectangular_input if i != 0]
             predicted = loaded_training_model.predict(rectangular_input)
+            # could also consider sampling from the probability distribution
             predicted_indices = [np.argmax(predicted[i]) for i in range(len(tokens_human))]
             predicted_human = [vu.nn_pos_tuple[i] for i in predicted_indices]
             target_indices = [rectangular_target[i] for i in range(len(tokens_human))]

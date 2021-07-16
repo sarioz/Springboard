@@ -12,6 +12,7 @@ NN_POS_TO_INT = frozendict({v: i for i, v in enumerate(NN_POS_TUPLE)})
 class VocabUtil:
 
     def __init__(self, sorted_input_tokens):
+        # Made sure that '<PAD>' and '<OOV>' aren't in the training corpus
         self.nn_input_tokens = ('<PAD>',) + tuple(sorted_input_tokens) + ('<OOV>',)
         self.nn_input_token_to_int = frozendict({v: i for i, v in enumerate(self.nn_input_tokens)})
         self.nn_pos_tuple = NN_POS_TUPLE

@@ -1,19 +1,30 @@
-import numpy as np
 import tensorflow as tf
 
 from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
 
 from labeled_data_loader import LabeledDataLoader
 from model_creator import LstmModelCreator
 from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
-BASE_DIR = f'models/01_uni_LSTM_masked_a_bigeta_oov/'
 
+EMBEDDING_DIM = 256
+LSTM_DIM = 512
+
+EXPERIMENT_NAME = f'02_uni_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 50
+
+BASE_DIR = f'models/{EXPERIMENT_NAME}/'
+
+CONTINUE_TRAINING = True
+INITIAL_EPOCH = 10 if CONTINUE_TRAINING else 0
+
+TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_9_valacc_0.78339.h5'
 
 
 def main_training():
+    print(f'Using TensorFlow version {tf.__version__}')
     loader = LabeledDataLoader('../data/pos/train.conll')
     tweets = loader.parse_tokens_and_labels(loader.load_lines())
 
@@ -34,15 +45,20 @@ def main_training():
 
     targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(rectangular_targets)
 
-    model_creator = LstmModelCreator(vu)
-    model = model_creator.create_lstm_model()
+    if CONTINUE_TRAINING:
+        model = load_model(TRAINING_MODEL_FILENAME_TO_CONTINUE)
+    else:
+        model_creator = LstmModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM)
+        model = model_creator.create_uni_lstm_model()
 
-    cp_filepath = BASE_DIR + '{epoch}_{val_accuracy:.5f}.h5'
+    cp_filepath = BASE_DIR + 'ep_{epoch}_valacc_{val_accuracy:.5f}.h5'
 
     checkpoint = ModelCheckpoint(cp_filepath, monitor='val_accuracy', verbose=1,
                                  save_best_only=False)
 
-    model.fit(rectangular_inputs, targets_one_hot_encoded, batch_size=32, epochs=MAX_EPOCHS,
+    model.fit(rectangular_inputs, targets_one_hot_encoded, batch_size=32,
+              initial_epoch=INITIAL_EPOCH,
+              epochs=MAX_EPOCHS,
               validation_split=0.1, callbacks=[checkpoint])
 
 
