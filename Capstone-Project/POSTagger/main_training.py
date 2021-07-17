@@ -9,16 +9,16 @@ from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
 
-EMBEDDING_DIM = 256
-LSTM_DIM = 512
+EMBEDDING_DIM = 128
+LSTM_DIM = 256
 
-EXPERIMENT_NAME = f'02_uni_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
+EXPERIMENT_NAME = f'03_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 50
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 
-CONTINUE_TRAINING = True
-INITIAL_EPOCH = 10 if CONTINUE_TRAINING else 0
+CONTINUE_TRAINING = False
+INITIAL_EPOCH = 10 if CONTINUE_TRAINING else -1
 
 TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_9_valacc_0.78339.h5'
 
@@ -49,7 +49,7 @@ def main_training():
         model = load_model(TRAINING_MODEL_FILENAME_TO_CONTINUE)
     else:
         model_creator = LstmModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM)
-        model = model_creator.create_uni_lstm_model()
+        model = model_creator.create_bi_lstm_model()
 
     cp_filepath = BASE_DIR + 'ep_{epoch}_valacc_{val_accuracy:.5f}.h5'
 
