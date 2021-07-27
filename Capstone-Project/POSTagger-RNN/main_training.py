@@ -13,14 +13,14 @@ EMBEDDING_DIM = 128
 LSTM_DIM = 256
 
 EXPERIMENT_NAME = f'03_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
-MAX_EPOCHS = 50
+MAX_EPOCHS = 100
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 
-CONTINUE_TRAINING = False
-INITIAL_EPOCH = 10 if CONTINUE_TRAINING else -1
+CONTINUE_TRAINING = True
+INITIAL_EPOCH = 50 if CONTINUE_TRAINING else -1
 
-TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_9_valacc_0.78339.h5'
+TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_50_valacc_0.93833.h5'
 
 
 def main_training():
@@ -46,8 +46,11 @@ def main_training():
     targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(rectangular_targets)
 
     if CONTINUE_TRAINING:
+        print('Continuing training from', TRAINING_MODEL_FILENAME_TO_CONTINUE)
         model = load_model(TRAINING_MODEL_FILENAME_TO_CONTINUE)
+        model.summary()
     else:
+        print("Commencing new training run")
         model_creator = LstmModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM)
         model = model_creator.create_bi_lstm_model()
 
