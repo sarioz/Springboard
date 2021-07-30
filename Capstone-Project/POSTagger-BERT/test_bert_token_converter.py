@@ -1,6 +1,6 @@
 import unittest
 
-from multilingual_bert_token_converter import MultilingualBertTokenConverter
+from bert_token_converter import BertTokenConverter
 
 BERT_PRETRAINED_MODEL_DIR = "../multi_cased_L-12_H-768_A-12/"
 
@@ -8,7 +8,7 @@ BERT_PRETRAINED_MODEL_DIR = "../multi_cased_L-12_H-768_A-12/"
 class MultilingualBertTokenConverterTestCase(unittest.TestCase):
 
     def test_convert(self):
-        converter = MultilingualBertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
+        converter = BertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
 
         result = converter.convert(
             [[('maybe', 'ADV'), ('the', 'DET'), ('teachers', 'NOUN'), ('are', 'VERB'), ('not', 'PART'), ('.', 'PUNCT')],
@@ -26,17 +26,17 @@ class MultilingualBertTokenConverterTestCase(unittest.TestCase):
                          result)
 
     def test_tokenize_value_oov_token(self):
-        converter = MultilingualBertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
+        converter = BertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
         self.assertEqual(['h', '^', 'l', '##j', '%', 'k', '##h'],
                          converter.tokenize_value('h^lj%kh'))
 
     def test_tokenize_value_continuation(self):
-        converter = MultilingualBertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
+        converter = BertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
         self.assertEqual(['##le'],
                          converter.tokenize_value('+le'))
 
     def test_tokenize_value_continued(self):
-        converter = MultilingualBertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
+        converter = BertTokenConverter(BERT_PRETRAINED_MODEL_DIR)
         self.assertEqual(['hacer'],
                          converter.tokenize_value('hacer+'))
 

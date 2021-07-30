@@ -7,8 +7,8 @@ from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
 
-EXPERIMENT_NAME = '01_uni_LSTM_masked_a_bigeta_oov_128_256'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/49_0.90931.h5'
+EXPERIMENT_NAME = '03_bi_LSTM_128_256'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_51_valacc_0.94030.h5'
 
 TRAINING_INPUT_FILENAME = '../data/pos/train.conll'
 DEV_INPUT_FILENAME = '../data/pos/dev.conll'
