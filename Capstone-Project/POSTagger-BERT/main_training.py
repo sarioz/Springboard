@@ -1,4 +1,5 @@
 import tensorflow as tf
+from bert import BertModelLayer
 
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import load_model
@@ -20,9 +21,9 @@ MAX_EPOCHS = 10
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 FINAL_TRAINED_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
 
-CONTINUE_TRAINING = False
-INITIAL_EPOCH = 0 if CONTINUE_TRAINING else -1
-TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'some_existing_file.h5'
+CONTINUE_TRAINING = True
+INITIAL_EPOCH = 2 if CONTINUE_TRAINING else 0
+TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_2_valacc_0.98046.h5'
 
 
 def main_training():
@@ -51,7 +52,8 @@ def main_training():
 
     if CONTINUE_TRAINING:
         print('Continuing training from', TRAINING_MODEL_FILENAME_TO_CONTINUE)
-        model = load_model(TRAINING_MODEL_FILENAME_TO_CONTINUE)
+        model = load_model(TRAINING_MODEL_FILENAME_TO_CONTINUE,
+                           custom_objects={"BertModelLayer": BertModelLayer})
         model.summary()
     else:
         print("Commencing new training run")
@@ -66,6 +68,7 @@ def main_training():
                                  save_best_only=False)
 
     model.fit(rectangular_inputs, targets_one_hot_encoded, batch_size=32,
+              initial_epoch=INITIAL_EPOCH,
               epochs=MAX_EPOCHS,
               validation_split=0.1, callbacks=[checkpoint])
 
