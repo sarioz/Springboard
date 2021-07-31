@@ -4,8 +4,8 @@ from vocab_util import TargetVocabUtil
 
 
 class NNInputPreparer:
-    def __init__(self, vu: TargetVocabUtil, max_seq_len: int):
-        self.vu = vu
+    def __init__(self, tvu: TargetVocabUtil, max_seq_len: int):
+        self.tvu = tvu
         self.max_seq_len = max_seq_len
 
     def filter_out_long_sequences(self, sequences: list) -> list:
@@ -55,7 +55,7 @@ class NNInputPreparer:
 
     def rectangular_targets_to_one_hot(self, rectangular_targets: np.ndarray) -> np.ndarray:
         encoded_data = np.zeros(
-            (len(rectangular_targets), len(rectangular_targets[0]), self.vu.get_output_vocab_size()), dtype="float32"
+            (len(rectangular_targets), len(rectangular_targets[0]), self.tvu.get_output_vocab_size()), dtype="float32"
         )
 
         for i, padded_target in enumerate(rectangular_targets):
