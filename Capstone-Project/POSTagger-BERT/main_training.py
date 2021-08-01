@@ -15,13 +15,13 @@ BERT_PRETRAINED_MODEL_DIR = "../multi_cased_L-12_H-768_A-12/"
 
 MAX_SEQ_LEN = 128
 
-EXPERIMENT_NAME = f'03_MLBERT_full'
+EXPERIMENT_NAME = f'04_MLBERT_nofreeze'
 MAX_EPOCHS = 10
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 FINAL_TRAINED_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
 
-CONTINUE_TRAINING = True
+CONTINUE_TRAINING = False
 INITIAL_EPOCH = 2 if CONTINUE_TRAINING else 0
 TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_2_valacc_0.98046.h5'
 
@@ -56,10 +56,11 @@ def main_training():
                            custom_objects={"BertModelLayer": BertModelLayer})
         model.summary()
     else:
-        print("Commencing new training run")
+        print('Commencing new training run')
         model_creator = BertModelCreator(model_dir=BERT_PRETRAINED_MODEL_DIR,
                                          tvu=tvu,
-                                         max_seq_len=MAX_SEQ_LEN)
+                                         max_seq_len=MAX_SEQ_LEN,
+                                         freeze_bert_layer=False)
         model = model_creator.create_model()
 
     cp_filepath = BASE_DIR + 'ep_{epoch}_valacc_{val_accuracy:.5f}.h5'
