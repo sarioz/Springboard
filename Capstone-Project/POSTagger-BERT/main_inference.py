@@ -48,7 +48,7 @@ def main_inference():
         predicted_index_sequences = [[np.argmax(q) for q in p] for p in predicted_probabilities]
         # print("token\tpredicted\ttarget\n")
 
-        predictions, correct_predictions = 0, 0
+        predictions = correct_predictions = 0
         tweet_accuracy_sum = 0.0
         for (tweet_orig_tokens, predicted_index_sequence) in zip(tweets_orig_tokens, predicted_index_sequences):
             tweet_level_predictions = tweet_level_correct_predictions = 0
