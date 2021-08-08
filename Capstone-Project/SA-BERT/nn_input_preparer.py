@@ -8,8 +8,9 @@ class NNInputPreparer:
         self.tvu = tvu
         self.max_seq_len = max_seq_len
 
-    def filter_out_long_sequences(self, sequences: list) -> list:
-        return [sequence for sequence in sequences if len(sequence) <= self.max_seq_len]
+    def filter_out_long_sequences(self, labeled_sequences: list) -> list:
+        return [(sequence, label) for (sequence, label) in labeled_sequences
+                if len(sequence) <= self.max_seq_len]
 
     def pad_tweet_batch(self, tweet_batch: list) -> list:
         """Pad tweets with [PAD] so that each tweet of a batch has the same length"""

@@ -39,6 +39,8 @@ def main_training():
 
     nn_input_preparer = NNInputPreparer(tvu=tvu, max_seq_len=MAX_SEQ_LEN)
 
+    irregular_inputs = nn_input_preparer.filter_out_long_sequences(irregular_inputs)
+
     rectangular_inputs = nn_input_preparer.rectangularize_inputs(irregular_inputs)
     targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(rectangular_targets)
 
