@@ -66,8 +66,8 @@ def main_inference():
 
             # print(f'{predicted_human_argmax}, {predicted_human_sampling}, {tvu.raw_sentiment_labels[target]}')
 
-        print('accuracy_argmax:', matches_argmax / k)
-        print('accuracy_sampling:', matches_sampling / k)
+        print('accuracy_argmax:', matches_argmax / len(rectangular_targets))
+        print('accuracy_sampling:', matches_sampling / len(rectangular_targets))
 
 
 if __name__ == '__main__':
