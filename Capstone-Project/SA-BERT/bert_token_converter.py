@@ -6,7 +6,7 @@ from vocab_util import TargetVocabUtil
 
 
 class BertTokenConverter:
-    def __init__(self, model_dir, tvu: TargetVocabUtil):
+    def __init__(self, model_dir: str, tvu: TargetVocabUtil):
         self.bert_tokenizer = bert.bert_tokenization.FullTokenizer(
             vocab_file=f'{model_dir}/vocab.txt',
             do_lower_case=False)
