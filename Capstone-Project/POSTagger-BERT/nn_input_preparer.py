@@ -42,17 +42,6 @@ class NNInputPreparer:
 
         return padded_labels_batch
 
-    # def rectangular_inputs_to_one_hot(self, rectangular_inputs: np.ndarray) -> np.ndarray:
-    #     encoded_data = np.zeros(
-    #         (len(rectangular_inputs), len(rectangular_inputs[0]), self.vu.get_input_vocab_size()), dtype="float32"
-    #     )
-    #
-    #     for i, padded_input in enumerate(rectangular_inputs):
-    #         for t, int_value in enumerate(padded_input):
-    #             encoded_data[i, t, int_value] = 1.0
-    #
-    #     return encoded_data
-
     def rectangular_targets_to_one_hot(self, rectangular_targets: np.ndarray) -> np.ndarray:
         encoded_data = np.zeros(
             (len(rectangular_targets), len(rectangular_targets[0]), self.tvu.get_output_vocab_size()), dtype="float32"
