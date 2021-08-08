@@ -8,10 +8,10 @@ from model_creator import LstmAndPoolingModelCreator
 from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
-EMBEDDING_DIM = 128
+EMBEDDING_DIM = 256
 LSTM_DIM = 256
 
-EXPERIMENT_NAME = f'02_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
+EXPERIMENT_NAME = f'03_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 20
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
