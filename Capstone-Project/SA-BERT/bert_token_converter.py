@@ -60,3 +60,12 @@ class BertTokenConverter:
             output_label = self.tvu.nn_rsl_to_int[raw_labeled_tweet[1]]
             output_labeled_tweet.append((output_values, output_label))
         return output_labeled_tweet
+
+    def prepend_cls(self, labeled_tweets: List[Tuple[List[int], int]]) -> List[Tuple[List[int], int]]:
+        cls_token_id_singleton = self.bert_tokenizer.convert_tokens_to_ids(['[CLS]'])
+        output_labeled_tweet: List[Tuple[List[int], int]] = []
+        for labeled_tweet in labeled_tweets:
+            output_values = cls_token_id_singleton + labeled_tweet[0]
+            output_label = labeled_tweet[1]
+            output_labeled_tweet.append((output_values, output_label))
+        return output_labeled_tweet
