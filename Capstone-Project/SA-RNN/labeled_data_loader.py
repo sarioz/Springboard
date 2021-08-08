@@ -14,7 +14,7 @@ class LabeledDataLoader:
 
         return lines
 
-    def parse_tokens_and_labels(self, lines: List[str]) -> List[List[Tuple[str, str]]]:
+    def parse_tokens_and_labels(self, lines: List[str]) -> List[Tuple[List[str], str]]:
         labeled_tweets = []
         tweet = []
         for line in lines:
