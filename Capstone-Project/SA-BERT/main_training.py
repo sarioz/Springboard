@@ -11,7 +11,7 @@ from vocab_util import TargetVocabUtil
 
 BERT_PRETRAINED_MODEL_DIR = "../multi_cased_L-12_H-768_A-12/"
 MAX_SEQ_LEN = 128
-EXPERIMENT_NAME = f'01_MLBERT_SA_hello'
+EXPERIMENT_NAME = f'02_MLBERT_SA_AdamW'
 MAX_EPOCHS = 10
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 FINAL_TRAINED_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
@@ -34,12 +34,11 @@ def main_training():
     converted_tweets = btc.convert_to_ids(converted_tweets)
     converted_tweets = btc.prepend_cls(converted_tweets)
 
+    nn_input_preparer = NNInputPreparer(tvu=tvu, max_seq_len=MAX_SEQ_LEN)
+    converted_tweets = nn_input_preparer.filter_out_long_sequences(converted_tweets)
+
     irregular_inputs = [tweet[0] for tweet in converted_tweets]
     rectangular_targets = [tweet[1] for tweet in converted_tweets]
-
-    nn_input_preparer = NNInputPreparer(tvu=tvu, max_seq_len=MAX_SEQ_LEN)
-
-    irregular_inputs = nn_input_preparer.filter_out_long_sequences(irregular_inputs)
 
     rectangular_inputs = nn_input_preparer.rectangularize_inputs(irregular_inputs)
     targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(rectangular_targets)
