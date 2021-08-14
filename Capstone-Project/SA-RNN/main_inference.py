@@ -17,8 +17,8 @@ def main_inference():
     print(f'Using TensorFlow version {tf.__version__}')
 
     print(f'Loading model {TRAINING_MODEL_FILENAME}')
-    loaded_training_model = load_model(TRAINING_MODEL_FILENAME)
-    loaded_training_model.summary()
+    trained_model = load_model(TRAINING_MODEL_FILENAME)
+    trained_model.summary()
 
     training_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
     labeled_training_tweets = training_loader.parse_tokens_and_labels(training_loader.load_lines())
@@ -44,7 +44,7 @@ def main_inference():
         num_correct_argmax_predictions = 0
         for irregular_input, target_human in tqdm(zip(irregular_inputs, rectangular_targets)):
             target_index = vu.nn_rsl_to_int[target_human]
-            predicted_probabilities = loaded_training_model.predict(irregular_input)[0]
+            predicted_probabilities = trained_model.predict(irregular_input)[0]
             # the predicted index if we take the class with the largest probability
             if np.argmax(predicted_probabilities) == target_index:
                 num_correct_argmax_predictions += 1
