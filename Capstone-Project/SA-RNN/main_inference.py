@@ -40,23 +40,34 @@ def main_inference():
 
         rectangular_targets = [labeled_tweet[1] for labeled_tweet in labeled_tweets]
 
+        argmax_confusion_matrix = np.zeros((vu.get_output_vocab_size(), vu.get_output_vocab_size()), dtype=int)
+        expected_sampling_confusion_matrix = np.zeros((vu.get_output_vocab_size(), vu.get_output_vocab_size()))
+
         expected_sampling_accuracy_sum = 0.0
         num_correct_argmax_predictions = 0
         for irregular_input, target_human in tqdm(zip(irregular_inputs, rectangular_targets)):
             target_index = vu.nn_rsl_to_int[target_human]
             predicted_probabilities = trained_model.predict(irregular_input)[0]
             # the predicted index if we take the class with the largest probability
-            if np.argmax(predicted_probabilities) == target_index:
+            argmax_index = np.argmax(predicted_probabilities)
+            if argmax_index == target_index:
                 num_correct_argmax_predictions += 1
+            argmax_confusion_matrix[target_index][argmax_index] += 1
             # rhs is the probability of guessing target_index if we sample according to predicted probabilities
             expected_sampling_accuracy_sum += predicted_probabilities[target_index]
-
+            for i in range(vu.get_output_vocab_size()):
+                expected_sampling_confusion_matrix[target_index][i] += predicted_probabilities[i]
         num_tweets_in_dataset = len(rectangular_targets)
 
         print(f'Argmax accuracy for {input_filename}:',
               num_correct_argmax_predictions / num_tweets_in_dataset)
         print(f'Expected sampling accuracy for {input_filename}:',
               expected_sampling_accuracy_sum / num_tweets_in_dataset)
+
+        print(f"Argmax confusion matrix of targets vs predicted for {input_filename}:\n",
+              argmax_confusion_matrix)
+        print("Expected sampling confusion matrix of targets vs predicted for {input_filename}:\n",
+              expected_sampling_confusion_matrix)
 
 
 if __name__ == '__main__':
