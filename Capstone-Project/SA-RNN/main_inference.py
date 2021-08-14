@@ -64,9 +64,11 @@ def main_inference():
         print(f'Expected sampling accuracy for {input_filename}:',
               expected_sampling_accuracy_sum / num_tweets_in_dataset)
 
-        print(f"Argmax confusion matrix of targets vs predicted for {input_filename}:\n",
+        print(f"Argmax confusion matrix of targets vs predicted for {input_filename}:\n"
+              f"{vu.raw_sentiment_labels}\n",
               argmax_confusion_matrix)
-        print("Expected sampling confusion matrix of targets vs predicted for {input_filename}:\n",
+        print(f"Expected sampling confusion matrix of targets vs predicted for {input_filename}:\n"
+              f"{vu.raw_sentiment_labels}\n",
               expected_sampling_confusion_matrix)
 
 
