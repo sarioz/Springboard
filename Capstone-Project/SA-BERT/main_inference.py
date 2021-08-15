@@ -10,7 +10,7 @@ from main_training import BERT_PRETRAINED_MODEL_DIR
 from nn_input_preparer import NNInputPreparer
 from vocab_util import TargetVocabUtil
 
-EXPERIMENT_NAME = f'01_MLBERT_SA_hello'
+EXPERIMENT_NAME = f'03_MLBERT_SA_AdamW'
 MAX_SEQ_LEN = 128
 TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_9_valacc_0.56639.h5'
 
@@ -39,8 +39,6 @@ def main_inference():
         print(f'Processing all not-too-long {len(tweets)} tweets from {input_filename}')
 
         irregular_inputs = [tweet[0] for tweet in tweets]
-        rectangular_inputs = nn_input_preparer.rectangularize_inputs(irregular_inputs)
-        print('rectangular_inputs.shape:', rectangular_inputs.shape)
         rectangular_targets = [tweet[1] for tweet in tweets]
 
         argmax_confusion_matrix = np.zeros((tvu.get_output_vocab_size(), tvu.get_output_vocab_size()), dtype=int)
@@ -76,6 +74,7 @@ def main_inference():
         print(f"Expected sampling confusion matrix of targets vs predicted for {input_filename}:\n"
               f"{tvu.raw_sentiment_labels}\n",
               expected_sampling_confusion_matrix)
+
 
 if __name__ == '__main__':
     main_inference()
