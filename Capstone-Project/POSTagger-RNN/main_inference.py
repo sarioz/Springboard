@@ -31,7 +31,6 @@ def main_inference():
     for input_filename in [DEV_INPUT_FILENAME]:
         loader = LabeledDataLoader(input_filename)
         tweets = loader.parse_tokens_and_labels(loader.load_lines())
-        print(f'mean average {input_filename} tweet length is {sum(len(tweet) for tweet in tweets) / len(tweets)}')
         tweets = nn_input_preparer.filter_out_long_sequences(tweets)
         print(f'processing all not-too-long {len(tweets)} tweets from {input_filename}')
         irregular_inputs = [[vu.nn_input_token_to_int[item[0]]
