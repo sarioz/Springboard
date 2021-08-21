@@ -4,43 +4,30 @@ from vocab_util import VocabUtil
 
 
 class NNInputPreparer:
-    def __init__(self, vu: VocabUtil):
+    def __init__(self, vu: VocabUtil, max_seq_len: int):
         self.vu = vu
+        self.max_seq_len = max_seq_len
 
-    def pad_tweet_batch(self, tweet_batch: list, max_length_in_batch: int) -> list:
-        """Pad tweets with <PAD> so that each tweet of a batch has the same length"""
-        return [tweet + [self.vu.nn_input_token_to_int['<PAD>']] * (max_length_in_batch - len(tweet))
+    def filter_out_long_sequences(self, sequences: list) -> list:
+        return [sequence for sequence in sequences if len(sequence) <= self.max_seq_len]
+
+    def pad_tweet_batch(self, tweet_batch: list) -> list:
+        """Pad tweets with <PAD> so that each tweet has length max_seq_len"""
+        return [tweet + [self.vu.nn_input_token_to_int['<PAD>']] * (self.max_seq_len - len(tweet))
                 for tweet in tweet_batch]
 
-    def pad_label_seq_batch(self, label_seqs_batch: list, max_length_in_batch: int) -> list:
-        """Pad label sequences with <PAD> so that each label sequence of a batch has the same length"""
-        return [label_seq + [self.vu.nn_pos_to_int['<PAD>']] * (max_length_in_batch - len(label_seq))
+    def pad_label_seq_batch(self, label_seqs_batch: list) -> list:
+        """Pad label sequences with <PAD> so that each label sequence has length max_seq_len"""
+        return [label_seq + [self.vu.nn_pos_to_int['<PAD>']] * (self.max_seq_len - len(label_seq))
                 for label_seq in label_seqs_batch]
 
     def rectangularize_inputs(self, tweets_batch_ints: list) -> np.ndarray:
-        max_length_in_batch = max([len(tweet) for tweet in tweets_batch_ints])
-        padded_tweets_batch = np.array(self.pad_tweet_batch(
-            tweets_batch_ints, max_length_in_batch
-        ))
+        padded_tweets_batch = np.array(self.pad_tweet_batch(tweets_batch_ints))
 
         return padded_tweets_batch
 
-    def compute_mask(self, tweets_batch_ints: list) -> np.ndarray:
-        max_length_in_batch = max([len(tweet) for tweet in tweets_batch_ints])
-        mask = np.zeros(
-            (len(tweets_batch_ints), max_length_in_batch), dtype="bool"
-        )
-        for i, tweet in enumerate(tweets_batch_ints):
-            for j in range(len(tweet)):
-                mask[i][j] = True
-
-        return mask
-
     def rectangularize_targets(self, label_seqs_batch_ints: list) -> np.ndarray:
-        max_length_in_batch = max([len(tweet_label) for tweet_label in label_seqs_batch_ints])
-        padded_labels_batch = np.array(self.pad_label_seq_batch(
-            label_seqs_batch_ints, max_length_in_batch
-        ))
+        padded_labels_batch = np.array(self.pad_label_seq_batch(label_seqs_batch_ints))
 
         return padded_labels_batch
 
