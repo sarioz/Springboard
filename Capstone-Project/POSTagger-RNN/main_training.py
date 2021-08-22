@@ -13,14 +13,14 @@ MAX_SEQ_LEN = 128
 EMBEDDING_DIM = 256
 LSTM_DIM = 256
 
-EXPERIMENT_NAME = f'05_filtered_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
+EXPERIMENT_NAME = f'06_mzf_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 100
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 
 CONTINUE_TRAINING = True
-INITIAL_EPOCH = 61 if CONTINUE_TRAINING else 0
-TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_61_valacc_0.95301.h5'
+INITIAL_EPOCH = 16 if CONTINUE_TRAINING else 0
+TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_16_valacc_0.99464.h5'
 
 
 def main_training():
@@ -48,7 +48,7 @@ def main_training():
         model.summary()
     else:
         print("Commencing new training run")
-        model_creator = LstmModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM)
+        model_creator = LstmModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM, mask_zero=False)
         model = model_creator.create_bi_lstm_model()
 
     cp_filepath = BASE_DIR + 'ep_{epoch}_valacc_{val_accuracy:.5f}.h5'

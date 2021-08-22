@@ -8,9 +8,10 @@ from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
 MAX_SEQ_LEN = 128
-EXPERIMENT_NAME = '05_filtered_bi_LSTM_256_256'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_64_valacc_0.95508.h5'
-
+# EXPERIMENT_NAME = '05_filtered_bi_LSTM_256_256'
+EXPERIMENT_NAME = '06_mzf_bi_LSTM_256_256'
+# TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_64_valacc_0.95508.h5'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_61_valacc_0.99712.h5'
 TRAINING_INPUT_FILENAME = '../data/pos/train.conll'
 DEV_INPUT_FILENAME = '../data/pos/dev.conll'
 
