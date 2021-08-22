@@ -11,7 +11,7 @@ from vocab_util import TargetVocabUtil
 
 BERT_PRETRAINED_MODEL_DIR = "../multi_cased_L-12_H-768_A-12/"
 MAX_SEQ_LEN = 128
-EXPERIMENT_NAME = f'02_MLBERT_SA_AdamW'
+EXPERIMENT_NAME = f'03_MLBERT_SA_AdamW'
 MAX_EPOCHS = 10
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 FINAL_TRAINED_MODEL_FILENAME = BASE_DIR + 'trained_model.h5'
