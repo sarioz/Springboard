@@ -12,12 +12,12 @@ class NNInputPreparer:
         return [sequence for sequence in sequences if len(sequence) <= self.max_seq_len]
 
     def pad_tweet_batch(self, tweet_batch: list) -> list:
-        """Pad tweets with [PAD] so that each tweet of a batch has the same length"""
+        """Pad tweets with [PAD] so that each tweet globally has the same length"""
         return [tweet + [0] * (self.max_seq_len - len(tweet))
                 for tweet in tweet_batch]
 
     def pad_label_seq_batch(self, label_seqs_batch: list) -> list:
-        """Pad label sequences with [PAD] so that each label sequence of a batch has the same length"""
+        """Pad label sequences with [PAD] so that each label sequence globally has the same length"""
         return [label_seq + [0] * (self.max_seq_len - len(label_seq))
                 for label_seq in label_seqs_batch]
 
@@ -37,7 +37,6 @@ class NNInputPreparer:
         return mask
 
     def rectangularize_targets(self, label_seqs_batch_ints: list) -> np.ndarray:
-        max_length_in_batch = max([len(tweet_label) for tweet_label in label_seqs_batch_ints])
         padded_labels_batch = np.array(self.pad_label_seq_batch(label_seqs_batch_ints))
 
         return padded_labels_batch
