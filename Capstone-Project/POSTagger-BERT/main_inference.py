@@ -34,7 +34,7 @@ def main_inference():
 
     for input_filename in [DEV_INPUT_FILENAME]:
         loader = LabeledDataLoader(input_filename)
-        tweets = loader.parse_raw_tokens_and_labels(loader.load_lines())[:10]
+        tweets = loader.parse_raw_tokens_and_labels(loader.load_lines())
         tweets = btc.convert_to_tokens(tweets)
         tweets = btc.convert_to_ids(tweets)
         tweets = nn_input_preparer.filter_out_long_sequences(tweets)
