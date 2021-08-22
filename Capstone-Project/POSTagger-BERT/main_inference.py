@@ -11,8 +11,8 @@ from nn_input_preparer import NNInputPreparer
 from vocab_util import TargetVocabUtil
 
 
-EXPERIMENT_NAME = '03_MLBERT_frozen_full'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_9_valacc_0.98173.h5'
+EXPERIMENT_NAME = '05_MLBERT_frozen_on_dev'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_2_valacc_0.98186.h5'
 MAX_SEQ_LEN = 128  # the model was trained for this
 
 TRAINING_INPUT_FILENAME = '../data/pos/train.conll'
@@ -72,7 +72,6 @@ def main_inference():
                     num_tokens_in_current_tweet += 1
                     num_tokens_in_dataset += 1
 
-            print('num_tokens_in_current_tweet:', num_tokens_in_current_tweet)
             # every tweet has at least one non-padding token, so we don't worry about division by zero
             current_tweet_argmax_accuracy = num_current_tweet_correct_argmax_predictions / num_tokens_in_current_tweet
             current_tweet_expected_sampling_accuracy = \
