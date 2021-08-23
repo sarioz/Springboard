@@ -1,6 +1,4 @@
-import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
 import bert
 import tensorflow_addons as tfa
 
@@ -31,7 +29,6 @@ class BertModelCreator:
 
         # LinCE paper uses AdamW(Loshchilov and Hutter, 2019)(η=5e−5, ε = 1e−8).
         opt = tfa.optimizers.AdamW(learning_rate=5e-5, weight_decay=1e-8)
-        # opt = tf.keras.optimizers.SGD(learning_rate=0.1, momentum=0.9)
         model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["accuracy"])
 
         return model
