@@ -36,9 +36,6 @@ def main_inference():
         labeled_tweets = nn_input_preparer.filter_out_long_tweets(labeled_tweets)
         print(f'processing all not-too-long {len(labeled_tweets)} tweets from {input_filename}')
 
-        print(sum([len(labeled_tweet[0]) for labeled_tweet in labeled_tweets]) / len(labeled_tweets))
-        exit(1)
-
         irregular_inputs = [[vu.nn_input_token_to_int[token]
                              if token in vu.nn_input_token_to_int
                              else vu.nn_input_token_to_int['<OOV>']
