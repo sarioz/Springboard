@@ -48,7 +48,7 @@ def main_training():
         model.summary()
     else:
         print("Commencing new training run")
-        model_creator = LstmAndPoolingModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM)
+        model_creator = LstmAndPoolingModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM, mask_zero=False)
         model = model_creator.create_bi_lstm_based_model()
 
     cp_filepath = BASE_DIR + 'ep_{epoch}_valacc_{val_accuracy:.5f}.h5'
