@@ -21,12 +21,12 @@ def main_inference():
     print(f'Loading model {TRAINING_MODEL_FILENAME}')
     trained_model = load_model(TRAINING_MODEL_FILENAME)
 
-    training_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
-    training_tweets = training_loader.parse_tokens_and_labels(training_loader.load_lines())
-    unique_training_tokens = set([item[0] for tweet in training_tweets for item in tweet])
-    sorted_training_tokens = sorted(unique_training_tokens)
+    tr_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
+    tr_tweets = tr_loader.parse_tokens_and_labels(tr_loader.load_lines())
+    tr_unique_tokens = set([item[0] for tweet in tr_tweets for item in tweet])
+    sorted_tr_tokens = sorted(tr_unique_tokens)
     # we should instantiate a vocab util only based on the training tokens, not dev/test tokens
-    vu = VocabUtil(sorted_training_tokens)
+    vu = VocabUtil(sorted_tr_tokens)
     nn_input_preparer = NNInputPreparer(vu, max_seq_len=MAX_SEQ_LEN)
 
     for input_filename in [DEV_INPUT_FILENAME]:
