@@ -4,10 +4,12 @@ from tensorflow.keras.models import load_model
 from tqdm import tqdm
 
 from labeled_data_loader import LabeledDataLoader
+from main_training import MAX_SEQ_LEN
+from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
-EXPERIMENT_NAME = '03_bi_LSTM_256_256'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_20_valacc_0.88770.h5'
+EXPERIMENT_NAME = '05_bi_LSTM_256_256'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_8_valacc_0.84131.h5'
 
 TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
@@ -26,18 +28,23 @@ def main_inference():
     sorted_training_tokens = sorted(unique_training_tokens)
     # we should instantiate a vocab util only based on the training tokens, not dev/test tokens
     vu = VocabUtil(sorted_training_tokens)
+    nn_input_preparer = NNInputPreparer(vu, MAX_SEQ_LEN)
 
-    for input_filename in [TRAINING_INPUT_FILENAME, DEV_INPUT_FILENAME]:
+    for input_filename in [DEV_INPUT_FILENAME]:
         loader = LabeledDataLoader(input_filename)
         labeled_tweets = loader.parse_tokens_and_labels(loader.load_lines())
-        print(f'processing all {len(labeled_tweets)} tweets from {input_filename}')
+        labeled_tweets = nn_input_preparer.filter_out_long_tweets(labeled_tweets)
+        print(f'processing all not-too-long {len(labeled_tweets)} tweets from {input_filename}')
+
+        print(sum([len(labeled_tweet[0]) for labeled_tweet in labeled_tweets]) / len(labeled_tweets))
+        exit(1)
 
         irregular_inputs = [[vu.nn_input_token_to_int[token]
                              if token in vu.nn_input_token_to_int
                              else vu.nn_input_token_to_int['<OOV>']
                              for token in labeled_tweet[0]]
                             for labeled_tweet in labeled_tweets]
-
+        rectangular_inputs = nn_input_preparer.rectangularize_inputs(irregular_inputs)
         rectangular_targets = [labeled_tweet[1] for labeled_tweet in labeled_tweets]
 
         argmax_confusion_matrix = np.zeros((vu.get_output_vocab_size(), vu.get_output_vocab_size()), dtype=int)
@@ -45,9 +52,9 @@ def main_inference():
 
         expected_sampling_accuracy_sum = 0.0
         num_correct_argmax_predictions = 0
-        for irregular_input, target_human in tqdm(zip(irregular_inputs, rectangular_targets)):
+        for rectangular_input, target_human in tqdm(zip(rectangular_inputs, rectangular_targets)):
             target_index = vu.nn_rsl_to_int[target_human]
-            predicted_probabilities = trained_model.predict(irregular_input)[0]
+            predicted_probabilities = trained_model.predict([rectangular_input])[0]
             # the predicted index if we take the class with the largest probability
             argmax_index = np.argmax(predicted_probabilities)
             if argmax_index == target_index:
