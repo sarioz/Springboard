@@ -12,7 +12,7 @@ MAX_SEQ_LEN = 128
 EMBEDDING_DIM = 256
 LSTM_DIM = 256
 
-EXPERIMENT_NAME = f'05_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
+EXPERIMENT_NAME = f'06_mzf_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 50
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
@@ -28,12 +28,13 @@ DEV_INPUT_FILENAME = '../data/sa/dev.conll'
 
 def main_training():
     print(f'Using TensorFlow version {tf.__version__}')
+
     tr_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
     tr_labeled_tweets = tr_loader.parse_tokens_and_labels(tr_loader.load_lines())
+    tr_unique_tokens = set([item for labeled_tweet in tr_labeled_tweets for item in labeled_tweet[0]])
+    tr_sorted_tokens = sorted(tr_unique_tokens)
+    vu = VocabUtil(tr_sorted_tokens)
 
-    tr_unique_input_tokens = set([item for labeled_tweet in tr_labeled_tweets for item in labeled_tweet[0]])
-    tr_sorted_input_tokens = sorted(tr_unique_input_tokens)
-    vu = VocabUtil(tr_sorted_input_tokens)
     nn_input_preparer = NNInputPreparer(vu, MAX_SEQ_LEN)
 
     tr_labeled_tweets = nn_input_preparer.filter_out_long_tweets(tr_labeled_tweets)

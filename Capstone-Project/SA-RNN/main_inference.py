@@ -8,8 +8,8 @@ from main_training import MAX_SEQ_LEN
 from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
-EXPERIMENT_NAME = '05_bi_LSTM_256_256'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_8_valacc_0.84131.h5'
+EXPERIMENT_NAME = '06_mzf_bi_LSTM_256_256'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_10_valacc_0.84131.h5'
 
 TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
@@ -22,12 +22,13 @@ def main_inference():
     trained_model = load_model(TRAINING_MODEL_FILENAME)
     trained_model.summary()
 
-    training_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
-    labeled_training_tweets = training_loader.parse_tokens_and_labels(training_loader.load_lines())
-    unique_training_tokens = set([item for labeled_tweet in labeled_training_tweets for item in labeled_tweet[0]])
-    sorted_training_tokens = sorted(unique_training_tokens)
-    # we should instantiate a vocab util only based on the training tokens, not dev/test tokens
-    vu = VocabUtil(sorted_training_tokens)
+    tr_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
+    tr_labeled_tweets = tr_loader.parse_tokens_and_labels(tr_loader.load_lines())
+    tr_unique_tokens = set([item for labeled_tweet in tr_labeled_tweets for item in labeled_tweet[0]])
+    tr_sorted_tokens = sorted(tr_unique_tokens)
+    # we instantiate a vocab util based on the training tokens, not dev/test tokens
+    vu = VocabUtil(tr_sorted_tokens)
+
     nn_input_preparer = NNInputPreparer(vu, MAX_SEQ_LEN)
 
     for input_filename in [DEV_INPUT_FILENAME]:
