@@ -25,12 +25,13 @@ class LexiconLoader:
         root = tree.getroot()
         for layer in root:
             if int(layer.attrib['level']) > self.max_level:
-                continue
+                break
             for sentiment_bucket in layer:
                 for lemma in sentiment_bucket:
                     lemma_text = lemma.text.strip()
                     if float(lemma.attrib['std']) <= self.max_std:
                         d[lemma_text] = float(lemma.attrib['pol'])
+
         return d
 
     def load_all_and_merge(self) -> dict:
