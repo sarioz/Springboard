@@ -52,8 +52,9 @@ def main_training():
     dev_targets = [labeled_tweet[1] for labeled_tweet in dev_labeled_tweets]
     dev_targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(dev_targets)
 
+    # Every epoch is cheap (< 1ms), so we don't need the ability to continue training from a previous model.
     print("Commencing new training run")
-    model_creator = ModelCreator(vu, batch_size=32)
+    model_creator = ModelCreator(vu)
     model = model_creator.create_two_dense_model(hidden_layer_size=HIDDEN_SIZE)
 
     cp_filepath = BASE_DIR + 'ep_{epoch}_valacc_{val_accuracy:.5f}.h5'
@@ -61,7 +62,6 @@ def main_training():
                                  save_best_only=False)
 
     model.fit(tr_network_input, tr_targets_one_hot_encoded, batch_size=32,
-              initial_epoch=INITIAL_EPOCH,
               epochs=MAX_EPOCHS,
               validation_data=(dev_network_input, dev_targets_one_hot_encoded),
               callbacks=[checkpoint])
