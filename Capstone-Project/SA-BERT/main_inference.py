@@ -10,9 +10,9 @@ from main_training import BERT_PRETRAINED_MODEL_DIR
 from nn_input_preparer import NNInputPreparer
 from vocab_util import TargetVocabUtil
 
-EXPERIMENT_NAME = f'03_MLBERT_SA_AdamW'
+EXPERIMENT_NAME = f'04_MLBERT_SA_AdamW_on_dev'
 MAX_SEQ_LEN = 128
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_9_valacc_0.56639.h5'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_5_valacc_0.55783.h5'
 
 TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
@@ -29,7 +29,7 @@ def main_inference():
     btc = BertTokenConverter(model_dir=BERT_PRETRAINED_MODEL_DIR, tvu=tvu)
     nn_input_preparer = NNInputPreparer(tvu=tvu, max_seq_len=MAX_SEQ_LEN)
 
-    for input_filename in [TRAINING_INPUT_FILENAME, DEV_INPUT_FILENAME]:
+    for input_filename in [DEV_INPUT_FILENAME]:
         loader = LabeledDataLoader(input_filename)
         tweets = loader.parse_tokens_and_labels(loader.load_lines())
         tweets = btc.convert(tweets)
