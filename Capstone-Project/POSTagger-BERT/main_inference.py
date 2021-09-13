@@ -11,8 +11,9 @@ from nn_input_preparer import NNInputPreparer
 from vocab_util import TargetVocabUtil
 
 
-EXPERIMENT_NAME = '05_MLBERT_frozen_on_dev'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_2_valacc_0.98186.h5'
+EXPERIMENT_NAME = '06_MLBERT_AdamW_frozen_dev'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_11_valacc_0.98016.h5'
+
 MAX_SEQ_LEN = 128  # the model was trained for this
 
 TRAINING_INPUT_FILENAME = '../data/pos/train.conll'
@@ -52,13 +53,13 @@ def main_inference():
             rectangular_targets = nn_input_preparer.rectangularize_targets([irregular_target_indices])
             num_tokens_in_current_tweet = num_current_tweet_correct_argmax_predictions = 0
             current_tweet_expected_sampling_accuracy_sum = 0.0
-            predicted_probabilities_sequence = trained_model.predict(rectangular_inputs)
+            predicted_probabilities_sequence = trained_model(rectangular_inputs)
             for predicted_probabilities, target_index in zip(
                     predicted_probabilities_sequence[0], rectangular_targets[0]):
                 # the predicted index if we take the class with the largest probability
                 argmax_index = np.argmax(predicted_probabilities)
                 # probability of guessing target_index if we sample according to predicted probabilities
-                prob_sampling_success_on_token = predicted_probabilities[target_index]
+                prob_sampling_success_on_token = tf.keras.backend.get_value(predicted_probabilities[target_index])
                 if argmax_index == target_index:
                     num_token_level_correct_argmax_predictions_incl_pads += 1
                 token_level_expected_sampling_accuracy_sum_incl_pads += prob_sampling_success_on_token
