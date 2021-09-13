@@ -23,12 +23,7 @@ def main_inference():
     for input_filename in [DEV_INPUT_FILENAME]:
         rectangular_inputs, rectangular_targets, targets_one_hot_encoded = \
             prep_validation_set(input_filename, nn_input_preparer, vu)
-        # rectangular_inputs = rectangular_inputs[:50]
-        # rectangular_targets = rectangular_targets[:50]
-        # targets_one_hot_encoded = targets_one_hot_encoded[:50]
-
         trained_model.evaluate(rectangular_inputs, targets_one_hot_encoded, batch_size=32)
-
         num_tokens_in_dataset = num_token_level_correct_argmax_predictions = \
             num_token_level_correct_argmax_predictions_incl_pads = 0
         tweet_level_argmax_accuracy_sum = tweet_level_expected_sampling_accuracy_sum = \
