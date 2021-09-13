@@ -49,7 +49,7 @@ def main_inference():
 
         for irregular_input, target_index in tqdm(zip(irregular_inputs, rectangular_targets)):
             rectangular_input_singleton = nn_input_preparer.rectangularize_inputs([irregular_input])
-            predicted_probabilities = trained_model.predict(rectangular_input_singleton)[0]
+            predicted_probabilities = trained_model(rectangular_input_singleton)[0]
             # the predicted index if we take the class with the largest probability
             argmax_index = np.argmax(predicted_probabilities)
             if argmax_index == target_index:
@@ -57,7 +57,7 @@ def main_inference():
             argmax_confusion_matrix[target_index][argmax_index] += 1
 
             # rhs is the probability of guessing target if we sample according to predicted probabilities
-            expected_sampling_accuracy_sum += predicted_probabilities[target_index]
+            expected_sampling_accuracy_sum += tf.keras.backend.get_value(predicted_probabilities[target_index])
             for i in range(tvu.get_output_vocab_size()):
                 expected_sampling_confusion_matrix[target_index][i] += predicted_probabilities[i]
 
