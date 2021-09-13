@@ -22,14 +22,10 @@ class NNInputPreparer:
                 for label_seq in label_seqs_batch]
 
     def rectangularize_inputs(self, tweets_batch_ints: list) -> np.ndarray:
-        padded_tweets_batch = np.array(self.pad_tweet_batch(tweets_batch_ints))
-
-        return padded_tweets_batch
+        return np.array(self.pad_tweet_batch(tweets_batch_ints))
 
     def rectangularize_targets(self, label_seqs_batch_ints: list) -> np.ndarray:
-        padded_labels_batch = np.array(self.pad_label_seq_batch(label_seqs_batch_ints))
-
-        return padded_labels_batch
+        return np.array(self.pad_label_seq_batch(label_seqs_batch_ints))
 
     def rectangular_inputs_to_one_hot(self, rectangular_inputs: np.ndarray) -> np.ndarray:
         encoded_data = np.zeros(
