@@ -58,7 +58,7 @@ def main_inference():
                 num_correct_argmax_predictions += 1
             argmax_confusion_matrix[target_index][argmax_index] += 1
             # rhs is the probability of guessing target_index if we sample according to predicted probabilities
-            expected_sampling_accuracy_sum += predicted_probabilities[target_index]
+            expected_sampling_accuracy_sum += tf.keras.backend.get_value(predicted_probabilities[target_index])
             for i in range(vu.get_output_vocab_size()):
                 expected_sampling_confusion_matrix[target_index][i] += predicted_probabilities[i]
         num_tweets_in_dataset = len(targets)
