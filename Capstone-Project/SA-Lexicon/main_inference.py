@@ -43,6 +43,8 @@ def main_inference():
         targets = [labeled_tweet[1] for labeled_tweet in labeled_tweets]
         targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(targets)
 
+        trained_model.evaluate(network_input, targets_one_hot_encoded)
+
         argmax_confusion_matrix = np.zeros((vu.get_output_vocab_size(), vu.get_output_vocab_size()), dtype=int)
         expected_sampling_confusion_matrix = np.zeros((vu.get_output_vocab_size(), vu.get_output_vocab_size()))
 
