@@ -34,8 +34,6 @@ def main_inference():
             rectangular_input_2d = np.array(rectangular_input)
             rectangular_input_2d.shape = (1, MAX_SEQ_LEN)
             predicted_probabilities_sequence = trained_model(rectangular_input_2d, training=False)[0]
-            # print("predicted_probabilities_sequence.shape:", predicted_probabilities_sequence.shape)
-            # print('rectangular_target_indices.shape:', rectangular_target_indices.shape)
             for predicted_probabilities, target_index in zip(
                     predicted_probabilities_sequence, rectangular_target_indices):
                 # the predicted index if we take the class with the largest probability
