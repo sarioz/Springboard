@@ -51,7 +51,7 @@ def main_inference():
         for rectangular_input, target_human in tqdm(zip(network_input, targets)):
             rectangular_input.shape = (1, 3)
             target_index = vu.nn_rsl_to_int[target_human]
-            predicted_probabilities = trained_model.predict(rectangular_input)[0]
+            predicted_probabilities = trained_model(rectangular_input)[0]
             # the predicted index if we take the class with the largest probability
             argmax_index = np.argmax(predicted_probabilities)
             if argmax_index == target_index:
