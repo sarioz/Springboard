@@ -9,11 +9,12 @@ from nn_input_preparer import NNInputPreparer
 from vocab_util import VocabUtil
 
 MAX_SEQ_LEN = 128
-EMBEDDING_DIM = 256
-LSTM_DIM = 256
+EMBEDDING_DIM = 64
+LSTM_DIM = 64
+MASK_ZERO = True
 
-EXPERIMENT_NAME = f'06_mzf_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
-MAX_EPOCHS = 50
+EXPERIMENT_NAME = f'13_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
+MAX_EPOCHS = 100
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
 
@@ -26,14 +27,37 @@ TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
 
 
-def main_training():
-    print(f'Using TensorFlow version {tf.__version__}')
-
-    tr_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
+def create_vocab_util_from_training_set(tr_input_filename: str) -> VocabUtil:
+    tr_loader = LabeledDataLoader(tr_input_filename)
     tr_labeled_tweets = tr_loader.parse_tokens_and_labels(tr_loader.load_lines())
     tr_unique_tokens = set([item for labeled_tweet in tr_labeled_tweets for item in labeled_tweet[0]])
     tr_sorted_tokens = sorted(tr_unique_tokens)
-    vu = VocabUtil(tr_sorted_tokens)
+    return VocabUtil(tr_sorted_tokens)
+
+
+def prep_validation_set(input_filename: str, nn_input_preparer: NNInputPreparer, vu: VocabUtil):
+    loader = LabeledDataLoader(input_filename)
+    labeled_tweets = loader.parse_tokens_and_labels(loader.load_lines())
+    labeled_tweets = nn_input_preparer.filter_out_long_tweets(labeled_tweets)
+    irregular_inputs = [[vu.nn_input_token_to_int[item[0]]
+                         if item[0] in vu.nn_input_token_to_int
+                         else vu.nn_input_token_to_int['<OOV>']
+                         for item in tweet]
+                        for tweet in labeled_tweets]
+    rectangular_inputs = nn_input_preparer.rectangularize_inputs(irregular_inputs)
+    rectangular_targets = [tweet[1] for tweet in labeled_tweets]
+    targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(rectangular_targets)
+
+    return rectangular_inputs, rectangular_targets, targets_one_hot_encoded
+
+
+def main_training():
+    print(f'Using TensorFlow version {tf.__version__}')
+
+    vu = create_vocab_util_from_training_set(TRAINING_INPUT_FILENAME)
+
+    tr_loader = LabeledDataLoader(TRAINING_INPUT_FILENAME)
+    tr_labeled_tweets = tr_loader.parse_tokens_and_labels(tr_loader.load_lines())
 
     nn_input_preparer = NNInputPreparer(vu, MAX_SEQ_LEN)
 
@@ -49,7 +73,8 @@ def main_training():
         model.summary()
     else:
         print("Commencing new training run")
-        model_creator = LstmAndPoolingModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM, mask_zero=False)
+        model_creator = LstmAndPoolingModelCreator(vu, embedding_dim=EMBEDDING_DIM, lstm_dim=LSTM_DIM,
+                                                   mask_zero=MASK_ZERO)
         model = model_creator.create_bi_lstm_based_model()
 
     cp_filepath = BASE_DIR + 'ep_{epoch}_valacc_{val_accuracy:.5f}.h5'
@@ -57,18 +82,10 @@ def main_training():
     checkpoint = ModelCheckpoint(cp_filepath, monitor='val_accuracy', verbose=1,
                                  save_best_only=False)
 
-    dev_loader = LabeledDataLoader(DEV_INPUT_FILENAME)
-    dev_labeled_tweets = dev_loader.parse_tokens_and_labels(dev_loader.load_lines())
-    dev_labeled_tweets = nn_input_preparer.filter_out_long_tweets(dev_labeled_tweets)
-    print(f'Validating on {len(dev_labeled_tweets)} dev tweets, each no longer than {MAX_SEQ_LEN} tokens')
-    dev_irregular_inputs = [[vu.nn_input_token_to_int[item[0]]
-                            if item[0] in vu.nn_input_token_to_int
-                            else vu.nn_input_token_to_int['<OOV>']
-                            for item in tweet]
-                            for tweet in dev_labeled_tweets]
-    dev_rectangular_inputs = nn_input_preparer.rectangularize_inputs(dev_irregular_inputs)
-    dev_rectangular_targets = [tweet[1] for tweet in dev_labeled_tweets]
-    dev_targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(dev_rectangular_targets)
+    dev_rectangular_inputs, dev_rectangular_targets, dev_targets_one_hot_encoded = \
+        prep_validation_set(DEV_INPUT_FILENAME, nn_input_preparer, vu)
+
+    print(f'Validating on {len(dev_rectangular_inputs)} dev tweets, each no longer than {MAX_SEQ_LEN} tokens')
 
     model.fit(tr_rectangular_inputs, tr_targets_one_hot_encoded, batch_size=32,
               initial_epoch=INITIAL_EPOCH,

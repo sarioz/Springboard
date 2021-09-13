@@ -23,10 +23,11 @@ class LstmAndPoolingModelCreator:
             ],
             name="sequential_lstm_based_model"
         )
-        model.summary()
 
         opt = tf.keras.optimizers.SGD(learning_rate=0.1, momentum=0.9)
         model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["accuracy"])
+
+        model.summary()
 
         return model
 
