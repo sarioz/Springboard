@@ -1,4 +1,4 @@
-*.csv
+**/*.csv
 nmt_with_attention
 unit18.2_Forecasting
 unit14.5_DL_model_training/
