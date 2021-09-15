@@ -54,5 +54,4 @@ class SentimentAnalyzer:
         argmax_index = np.argmax(predicted_probabilities)
         predicted_sentiment = self.vu.raw_sentiment_labels[argmax_index]
 
-        print(tokenized_tweet, predicted_sentiment)
         return tokenized_tweet, predicted_sentiment
