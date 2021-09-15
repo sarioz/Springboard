@@ -46,7 +46,7 @@ class SentimentAnalyzer:
     def make_prediction(self, tweet: str) -> (List[str], str):
         tokenized_tweet, rectangular_inputs = prep_single_tweet(tweet, self.nn_input_preparer, self.vu)
         if not tokenized_tweet:
-            return ["Error"], [f"Input tweet can be at most {MAX_SEQ_LEN} tokens long."]
+            return ["Input error"], f"Input tweet can be at most {MAX_SEQ_LEN} tokens long."
 
         rectangular_input_2d = np.array(rectangular_inputs)
         rectangular_input_2d.shape = (1, MAX_SEQ_LEN)
