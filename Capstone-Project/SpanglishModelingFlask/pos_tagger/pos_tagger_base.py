@@ -25,7 +25,8 @@ def create_vocab_util_from_training_set(tr_input_filename: str) -> VocabUtil:
 def prep_single_tweet(tweet: str, nn_input_preparer: NNInputPreparer, vu: VocabUtil):
     tokenized_tweet = tweet.strip().split()
     if len(tokenized_tweet) > MAX_SEQ_LEN:
-        return None, None
+        raise ValueError(f"The Part-Of-Speech Tagger has tokenized the input to {len(tokenized_tweet)} tokens. "
+            f"Maximum allowed is {MAX_SEQ_LEN}.")
     irregular_input = [[vu.nn_input_token_to_int[item]
                        if item in vu.nn_input_token_to_int
                        else vu.nn_input_token_to_int['<OOV>']
@@ -36,17 +37,15 @@ def prep_single_tweet(tweet: str, nn_input_preparer: NNInputPreparer, vu: VocabU
 
 class PosTagger:
     def __init__(self):
-        print('Initializing POS Tagger')
-        print(f'Using TensorFlow version {tf.__version__}')
-        print(f'Loading model {TRAINING_MODEL_FILENAME}')
+        print('Initializing POS Tagger', flush=True)
+        print(f'Using TensorFlow version {tf.__version__}', flush=True)
+        print(f'Loading model {TRAINING_MODEL_FILENAME}', flush=True)
         self.trained_model = load_model(TRAINING_MODEL_FILENAME, compile=False)
         self.vu = create_vocab_util_from_training_set(TRAINING_INPUT_FILENAME)
         self.nn_input_preparer = NNInputPreparer(self.vu, max_seq_len=MAX_SEQ_LEN)
 
     def make_prediction(self, tweet: str) -> (List[str], List[str]):
         tokenized_tweet, rectangular_inputs = prep_single_tweet(tweet, self.nn_input_preparer, self.vu)
-        if not tokenized_tweet:
-            return ["Error"], [f"Input tweet can be at most {MAX_SEQ_LEN} tokens long."]
 
         rectangular_input_2d = np.array(rectangular_inputs)
         rectangular_input_2d.shape = (1, MAX_SEQ_LEN)
