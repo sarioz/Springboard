@@ -1,6 +1,30 @@
 h1 {
     border: 2px #eee solid;
-    color: brown;
+    color: black;
     text-align: center;
     padding: 10px;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  border: 3px solid black;
+}
+
+th, td {
+  padding: 20px;
+  text-align: center;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #e8e8e8;
+}
+
+table {
+  background-color: #ffffff;
 }

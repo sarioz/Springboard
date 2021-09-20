@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Part of Speech Tagging Results
+{% endblock %}
+
+{% block content %}
+<h1>
+    Part of Speech Tagging Results
+</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Token</th>
+            <th scope="col">POS Tag</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for token, tag in zip(tweet_tokens, pos_predictions) %}
+        <tr>
+            <td>{{ token }}</td>
+            <td>{{ tag }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

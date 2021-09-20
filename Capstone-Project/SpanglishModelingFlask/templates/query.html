@@ -8,10 +8,12 @@
         <textarea name="content" placeholder="Post content"
                   class="form-control">{{ request.form['content'] }}</textarea>
     </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-primary" name="tag_pos">Tag Parts of Speech</button>
         <button type="submit" class="btn btn-primary" name="analyze_sentiment">Analyze Sentiment</button>
     </div>
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <ul class=flashes>

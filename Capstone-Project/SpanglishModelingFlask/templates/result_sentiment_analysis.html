@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Sentiment Analysis Results Page
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    Sentiment Analysis Results
+</h1>
+
+<h3>Interpreted content (reconstituted from tokens)</h3>
+<p>
+    {{' '.join(tokens)}}
+</p>
+
+<h3>Detected sentiment</h3>
+<p>
+    {{sentiment}}
+</p>
+{% endblock %}
