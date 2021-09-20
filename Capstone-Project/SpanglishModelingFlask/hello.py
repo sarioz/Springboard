@@ -1,10 +1,18 @@
+import sys
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
 from flask import Flask, render_template, request, flash, url_for, redirect
 from werkzeug.exceptions import abort
-from pos_tagger.pos_tagger import PosTagger
-from sentiment_analyzer.sentiment_analyzer import SentimentAnalyzer
+
+from pos_tagger.pos_tagger_base import PosTagger
+from sentiment_analyzer.sentiment_analyzer_base import SentimentAnalyzer
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8t4haf390h9a4h8r'
+app.jinja_env.globals.update(zip=zip)
 
 
 pos_tagger = PosTagger()
@@ -16,16 +24,9 @@ def hello():
     return 'Hello, World!'
 
 
-def prettify_pos_prediction(tweet_tokens, pos_predictions) -> str:
-    output = ""
-    for token, tag in zip(tweet_tokens, pos_predictions):
-        output += f"{token}:\t{tag}\n<BR>\n"
-    return output
-
-
 def perform_pos_tagging(content) -> str:
     tweet_tokens, pos_predictions = pos_tagger.make_prediction(content)
-    return prettify_pos_prediction(tweet_tokens, pos_predictions)
+    return render_template('result_pos_tagging.html', tweet_tokens=tweet_tokens, pos_predictions=pos_predictions)
 
 
 def prettify_sa_prediction(tweet_tokens, sentiment) -> str:
@@ -33,8 +34,8 @@ def prettify_sa_prediction(tweet_tokens, sentiment) -> str:
 
 
 def perform_sentiment_analysis(content) -> str:
-    tweet_tokens, sentiment = sentiment_analyzer.make_prediction(content)
-    return prettify_sa_prediction(tweet_tokens, sentiment)
+    tokens, sentiment = sentiment_analyzer.make_prediction(content)
+    return render_template('result_sentiment_analysis.html', tokens=tokens, sentiment=sentiment)
 
 
 @app.route('/', methods=('GET', 'POST'))
@@ -42,13 +43,25 @@ def index():
     if request.method == 'POST':
         content = request.form['content']
         if not content:
-            flash('Content is required!')
+            flash('Content is required to be nonempty')
         else:
             if 'tag_pos' in request.form:
-                return perform_pos_tagging(content)
+                try:
+                    return perform_pos_tagging(content)
+                except ValueError as value_error:
+                    if value_error.args:
+                        flash(' '.join(value_error.args))
+                    else:
+                        flash("A further unspecified ValueError has occurred.")
             elif 'analyze_sentiment' in request.form:
-                return perform_sentiment_analysis(content)
+                try:
+                    return perform_sentiment_analysis(content)
+                except ValueError as value_error:
+                    if value_error.args:
+                        flash(' '.join(value_error.args))
+                    else:
+                        flash("A further unspecified ValueError has occurred.")
             else:
-                return 'invalid submission - please use the UI'
+                return 'Invalid submission - please use the web based user interface.'
 
     return render_template('query.html')
