@@ -3,7 +3,7 @@ FROM continuumio/miniconda:latest
 WORKDIR /home/docker_conda_template
 
 COPY environment.yml ./
-COPY hello.py ./
+COPY app.py ./
 COPY boot.sh ./
 COPY pos_tagger ./pos_tagger/
 COPY sentiment_analyzer ./sentiment_analyzer/
