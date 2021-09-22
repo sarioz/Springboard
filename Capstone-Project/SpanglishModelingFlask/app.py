@@ -15,11 +15,6 @@ pos_tagger = PosTagger()
 sentiment_analyzer = SentimentAnalyzer()
 
 
-@app.route('/hello')
-def hello():
-    return 'Hello, World!'
-
-
 def perform_pos_tagging(content) -> str:
     tweet_tokens, pos_predictions = pos_tagger.make_prediction(content)
     return render_template('result_pos_tagging.html', tweet_tokens=tweet_tokens, pos_predictions=pos_predictions)
