@@ -1,9 +1,6 @@
 import sys
 import os
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
 from flask import Flask, render_template, request, flash, url_for, redirect
 from werkzeug.exceptions import abort
 
@@ -13,7 +10,6 @@ from sentiment_analyzer.sentiment_analyzer_base import SentimentAnalyzer
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8t4haf390h9a4h8r'
 app.jinja_env.globals.update(zip=zip)
-
 
 pos_tagger = PosTagger()
 sentiment_analyzer = SentimentAnalyzer()
@@ -27,10 +23,6 @@ def hello():
 def perform_pos_tagging(content) -> str:
     tweet_tokens, pos_predictions = pos_tagger.make_prediction(content)
     return render_template('result_pos_tagging.html', tweet_tokens=tweet_tokens, pos_predictions=pos_predictions)
-
-
-def prettify_sa_prediction(tweet_tokens, sentiment) -> str:
-    return f"Content: {' '.join(tweet_tokens)}<BR>\nSentiment: {sentiment}<BR>"
 
 
 def perform_sentiment_analysis(content) -> str:
