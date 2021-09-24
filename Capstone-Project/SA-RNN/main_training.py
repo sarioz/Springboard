@@ -13,7 +13,7 @@ EMBEDDING_DIM = 64
 LSTM_DIM = 64
 MASK_ZERO = True
 
-EXPERIMENT_NAME = f'13_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
+EXPERIMENT_NAME = f'14_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 100
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
@@ -32,6 +32,7 @@ def create_vocab_util_from_training_set(tr_input_filename: str) -> VocabUtil:
     tr_labeled_tweets = tr_loader.parse_tokens_and_labels(tr_loader.load_lines())
     tr_unique_tokens = set([item for labeled_tweet in tr_labeled_tweets for item in labeled_tweet[0]])
     tr_sorted_tokens = sorted(tr_unique_tokens)
+    print(f"Creating VocabUtil from {len(tr_sorted_tokens)} unique tokens.")
     return VocabUtil(tr_sorted_tokens)
 
 
@@ -39,11 +40,11 @@ def prep_validation_set(input_filename: str, nn_input_preparer: NNInputPreparer,
     loader = LabeledDataLoader(input_filename)
     labeled_tweets = loader.parse_tokens_and_labels(loader.load_lines())
     labeled_tweets = nn_input_preparer.filter_out_long_tweets(labeled_tweets)
-    irregular_inputs = [[vu.nn_input_token_to_int[item[0]]
-                         if item[0] in vu.nn_input_token_to_int
+    irregular_inputs = [[vu.nn_input_token_to_int[token]
+                         if token in vu.nn_input_token_to_int
                          else vu.nn_input_token_to_int['<OOV>']
-                         for item in tweet]
-                        for tweet in labeled_tweets]
+                         for token in labeled_tweet[0]]
+                        for labeled_tweet in labeled_tweets]
     rectangular_inputs = nn_input_preparer.rectangularize_inputs(irregular_inputs)
     rectangular_targets = [tweet[1] for tweet in labeled_tweets]
     targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(rectangular_targets)
@@ -62,10 +63,19 @@ def main_training():
     nn_input_preparer = NNInputPreparer(vu, MAX_SEQ_LEN)
 
     tr_labeled_tweets = nn_input_preparer.filter_out_long_tweets(tr_labeled_tweets)
-    tr_irregular_inputs = [[vu.nn_input_token_to_int[item[0]] for item in tweet] for tweet in tr_labeled_tweets]
-    tr_rectangular_targets = [tweet[1] for tweet in tr_labeled_tweets]
+    tr_irregular_inputs = [[vu.nn_input_token_to_int[token]
+                            if token in vu.nn_input_token_to_int
+                            else vu.nn_input_token_to_int['<OOV>']
+                            for token in labeled_tweet[0]]
+                           for labeled_tweet in tr_labeled_tweets]
+    tr_rectangular_targets = [labeled_tweet[1] for labeled_tweet in tr_labeled_tweets]
     tr_rectangular_inputs = nn_input_preparer.rectangularize_inputs(tr_irregular_inputs)
     tr_targets_one_hot_encoded = nn_input_preparer.rectangular_targets_to_one_hot(tr_rectangular_targets)
+
+    print(tr_labeled_tweets[0])
+    print(tr_irregular_inputs[0])
+    print(tr_rectangular_inputs[0])
+    print(tr_targets_one_hot_encoded[0])
 
     if CONTINUE_TRAINING:
         print('Continuing training from', TRAINING_MODEL_FILENAME_TO_CONTINUE)

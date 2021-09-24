@@ -6,8 +6,8 @@ from tqdm import tqdm
 from main_training import MAX_SEQ_LEN, create_vocab_util_from_training_set, prep_validation_set
 from nn_input_preparer import NNInputPreparer
 
-EXPERIMENT_NAME = '06_mzf_bi_LSTM_256_256'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_10_valacc_0.84131.h5'
+EXPERIMENT_NAME = '14_bi_LSTM_64_64'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_6_valacc_0.56912.h5'
 
 TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
@@ -34,11 +34,18 @@ def main_inference():
 
         expected_sampling_accuracy_sum = 0.0
         num_correct_argmax_predictions = 0
+        it = 0
         for rectangular_input, target_human in tqdm(zip(rectangular_inputs, rectangular_targets)):
+            it += 1
             target_index = vu.nn_rsl_to_int[target_human]
             rectangular_input_2d = np.array(rectangular_input)
             rectangular_input_2d.shape = (1, MAX_SEQ_LEN)
             predicted_probabilities = trained_model(rectangular_input_2d, training=False)[0]
+            if it < 10:
+                print(rectangular_input)
+                print('target_index:', target_index)
+                print(predicted_probabilities)
+                print()
             # the predicted index if we take the class with the largest probability
             argmax_index = np.argmax(predicted_probabilities)
             if argmax_index == target_index:
