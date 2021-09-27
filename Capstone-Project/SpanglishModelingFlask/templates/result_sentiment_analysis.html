@@ -11,12 +11,21 @@ Sentiment Analysis Results Page
 </h1>
 
 <h3>Interpreted content (reconstituted from tokens)</h3>
-<p>
+
+<center>
+<h4>
     {{' '.join(tokens)}}
-</p>
+</h4>
+</center>
 
 <h3>Detected sentiment</h3>
-<p>
-    {{sentiment}}
-</p>
+<center>
+    <h2>{{sentiment}}</h2>
+    out of [negative, neutral, positive]
+</center>
+
+<h2>
+    <a href="..">Back</a>
+</h2>
+
 {% endblock %}
