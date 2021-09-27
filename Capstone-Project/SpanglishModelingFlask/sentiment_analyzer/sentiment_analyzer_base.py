@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from typing import List
 
+from sentiment_analyzer.util.combined_tokenizer import CombinedTokenizer
 from sentiment_analyzer.util.labeled_data_loader import LabeledDataLoader
 from sentiment_analyzer.util.nn_input_preparer import NNInputPreparer
 from sentiment_analyzer.util.vocab_util import VocabUtil
@@ -23,8 +24,8 @@ def create_vocab_util_from_training_set(tr_input_filename: str) -> VocabUtil:
     return VocabUtil(tr_sorted_tokens)
 
 
-def prep_single_tweet(tweet: str, nn_input_preparer: NNInputPreparer, vu: VocabUtil):
-    tokenized_tweet = tweet.strip().split()
+def prep_single_tweet(tweet: str, tokenizer: CombinedTokenizer, nn_input_preparer: NNInputPreparer, vu: VocabUtil):
+    tokenized_tweet = tokenizer.tokenize(tweet)
     if len(tokenized_tweet) > MAX_SEQ_LEN:
         raise ValueError(f"The Sentiment Analyzer has tokenized the input to {len(tokenized_tweet)} tokens. "
                          f"Maximum allowed is {MAX_SEQ_LEN}.")
@@ -44,11 +45,12 @@ class SentimentAnalyzer:
         print(f'Using TensorFlow version {tf.__version__}', flush=True)
         print(f'Loading model {TRAINING_MODEL_FILENAME}', flush=True)
         self.trained_model = load_model(TRAINING_MODEL_FILENAME, compile=False)
+        self.tokenizer = CombinedTokenizer()
         self.vu = create_vocab_util_from_training_set(TRAINING_INPUT_FILENAME)
         self.nn_input_preparer = NNInputPreparer(self.vu, max_seq_len=MAX_SEQ_LEN)
 
     def make_prediction(self, tweet: str) -> (List[str], str):
-        tokenized_tweet, rectangular_inputs = prep_single_tweet(tweet, self.nn_input_preparer, self.vu)
+        tokenized_tweet, rectangular_inputs = prep_single_tweet(tweet, self.tokenizer, self.nn_input_preparer, self.vu)
 
         rectangular_input_2d = np.array(rectangular_inputs)
         rectangular_input_2d.shape = (1, MAX_SEQ_LEN)
