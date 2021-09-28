@@ -12,6 +12,7 @@ MAX_SEQ_LEN = 128
 EMBEDDING_DIM = 64
 LSTM_DIM = 64
 MASK_ZERO = True
+UPSAMPLE = True
 
 EXPERIMENT_NAME = f'15_upsampled_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 100
@@ -25,8 +26,6 @@ TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_6_valacc_0.87869.h5'
 
 TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
-
-UPSAMPLE = True
 
 
 def create_vocab_util_from_training_set(tr_input_filename: str) -> VocabUtil:
