@@ -46,18 +46,19 @@ After initialization succeeds, you can hit the app using your web browser at htt
 
 ## Docker Build and Image Push
 
-Once you are satisfied and want to containerize it, run
+Once you are satisfied and want to containerize your web app, run
 
 ```$ docker build -t yourdockerhubusername/spanglish-modeling-app:latest .```
 
-Then you may push it to [Docker Hub](https://hub.docker.com/) using
+This takes approximately 6 minutes on my mid-2015 Macbook Pro (on *my* latest version).
+Then you may push the built Docker image to [Docker Hub](https://hub.docker.com/) using
 
 ```$ docker image push -a yourdockerhubusername/spanglish-modeling-app```
 
-Once this is successful, you may follow the instructions in the previous section for deployment, making sure to change
-`sarioz` to `yourdockerhubusername`.
+Once this is successful, you may follow the instructions in the previous section for deployment,
+making sure to change `sarioz` to `yourdockerhubusername`.
 
-## Training and Evaluation: Build and Run
+## Training and Evaluation
 
 To replicate the [project results](https://docs.google.com/spreadsheets/d/1PwbSxT5r1alqZVMPIM7L0D00pduHuVTRr8YP8eLYMAs/edit?usp=sharing)
 or tweak the training algorithms, it is easiest to pull the entire
@@ -85,7 +86,7 @@ A superset of the required dependencies for experimentation and model building c
 ```Capstone-Project/training_environment.yml```. This file has been generated fully automatically using
 ```$ conda env export --no-build > training_environment.yml``` from the corresponding Conda+Pip environment
 (which I have locally named ```py_3_7_tf_2_4```).
-In order to automatically reconstruct this environment, make sure that Anaconda (https://www.anaconda.com/)
+In order to automatically reconstruct this environment, make sure that [Anaconda](https://www.anaconda.com/)
 is installed, and run
 
 ```$ conda env create -f=training_environment.yml -n training-environment```
