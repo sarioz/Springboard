@@ -36,6 +36,7 @@ These are part of the LinCE corpora.
 You need a *kostenlos* [LinCE](https://ritual.uh.edu/lince/) account at to download these
 files from [pos_spaeng](https://ritual.uh.edu/lince/benchmark/pos_spaeng.zip) and
 [sa_spaeng](https://ritual.uh.edu/lince/benchmark/sa_spaeng.zip).
+(The corpora come with a nice [paper](https://arxiv.org/abs/2005.04322) which does not require creating any account).
 
 To run the web app locally and in development mode, use:
 
@@ -49,7 +50,8 @@ Once you are satisfied and want to containerize it, run
 
 ```$ docker build -t yourdockerhubusername/spanglish-modeling-app:latest .```
 
-Then you may push it to docker hub using
+Then you may push it to [Docker Hub](https://hub.docker.com/) using
+
 ```$ docker image push -a yourdockerhubusername/spanglish-modeling-app```
 
 Once this is successful, you may follow the instructions in the previous section for deployment, making sure to change
