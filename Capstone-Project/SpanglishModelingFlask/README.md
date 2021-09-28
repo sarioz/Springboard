@@ -65,7 +65,7 @@ To replicate the
 or tweak the training algorithms, it is easiest to pull the entire
 ```Capstone-Project/``` then descend into any of the five subdirectories:
 ```POSTagger-RNN```, ```POSTagger-BERT```, ```SA-RNN```, ```SA-BERT```, or ```SA-Lexicon```.
-The ones chosen for use in the web app are ```POSTagger-RNN``` and ```SA-RNN```.
+The ones chosen for the web app are ```POSTagger-RNN``` and ```SA-RNN```.
 
 Now you need to have not only the training sets
  ```data/pos/train.conll``` and ```data/sa/train.conll```
