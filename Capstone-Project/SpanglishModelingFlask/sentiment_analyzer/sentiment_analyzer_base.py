@@ -9,8 +9,8 @@ from sentiment_analyzer.util.nn_input_preparer import NNInputPreparer
 from sentiment_analyzer.util.vocab_util import VocabUtil
 
 MAX_SEQ_LEN = 128
-EXPERIMENT_NAME = '14_bi_LSTM_64_64'
-TRAINING_MODEL_FILENAME = f'sentiment_analyzer/models/{EXPERIMENT_NAME}/ep_6_valacc_0.56912.h5'
+EXPERIMENT_NAME = '15_upsampled_bi_LSTM_64_64'
+TRAINING_MODEL_FILENAME = f'sentiment_analyzer/models/{EXPERIMENT_NAME}/ep_3_valacc_0.48761.h5'
 TRAINING_INPUT_FILENAME = 'data/sa/train.conll'
 
 
