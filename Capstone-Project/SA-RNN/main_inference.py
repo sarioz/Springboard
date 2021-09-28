@@ -6,11 +6,13 @@ from tqdm import tqdm
 from main_training import MAX_SEQ_LEN, create_vocab_util_from_training_set, prep_validation_set
 from nn_input_preparer import NNInputPreparer
 
-EXPERIMENT_NAME = '14_bi_LSTM_64_64'
-TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_6_valacc_0.56912.h5'
+EXPERIMENT_NAME = '15_upsampled_bi_LSTM_64_64'
+TRAINING_MODEL_FILENAME = f'models/{EXPERIMENT_NAME}/ep_8_valacc_0.46249.h5'
 
 TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
+
+UPSAMPLE = True
 
 
 def main_inference():
@@ -25,7 +27,7 @@ def main_inference():
 
     for input_filename in [DEV_INPUT_FILENAME]:
         rectangular_inputs, rectangular_targets, targets_one_hot_encoded = \
-            prep_validation_set(input_filename, nn_input_preparer, vu)
+            prep_validation_set(input_filename, nn_input_preparer, vu, UPSAMPLE)
 
         trained_model.evaluate(rectangular_inputs, targets_one_hot_encoded, batch_size=32)
 

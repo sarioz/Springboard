@@ -1,5 +1,6 @@
 import numpy as np
 from typing import List
+from collections import Counter
 
 from vocab_util import VocabUtil
 
@@ -11,6 +12,16 @@ class NNInputPreparer:
 
     def filter_out_long_tweets(self, labeled_tweets: List[tuple]) -> list:
         return [labeled_tweet for labeled_tweet in labeled_tweets if len(labeled_tweet[0]) <= self.max_seq_len]
+
+    def crude_upsample(self, labeled_tweets: List[tuple]) -> List[tuple]:
+        result = []
+        multipliers = {'negative': 3, 'neutral': 2, 'positive': 1}
+        for tweet, label in labeled_tweets:
+            for _ in range(multipliers[label]):
+                result.append((tweet, label))
+        c = Counter([upsampled_labeled_tweet[1] for upsampled_labeled_tweet in result])
+        print(c)
+        return result
 
     def pad_tweet_batch(self, tweet_batch: list) -> list:
         """Pad tweets with <PAD> so that each tweet globally has the same length"""

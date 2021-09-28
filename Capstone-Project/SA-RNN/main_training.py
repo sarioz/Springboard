@@ -13,7 +13,7 @@ EMBEDDING_DIM = 64
 LSTM_DIM = 64
 MASK_ZERO = True
 
-EXPERIMENT_NAME = f'14_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
+EXPERIMENT_NAME = f'15_upsampled_bi_LSTM_{EMBEDDING_DIM}_{LSTM_DIM}'
 MAX_EPOCHS = 100
 
 BASE_DIR = f'models/{EXPERIMENT_NAME}/'
@@ -26,6 +26,8 @@ TRAINING_MODEL_FILENAME_TO_CONTINUE = BASE_DIR + 'ep_6_valacc_0.87869.h5'
 TRAINING_INPUT_FILENAME = '../data/sa/train.conll'
 DEV_INPUT_FILENAME = '../data/sa/dev.conll'
 
+UPSAMPLE = True
+
 
 def create_vocab_util_from_training_set(tr_input_filename: str) -> VocabUtil:
     tr_loader = LabeledDataLoader(tr_input_filename)
@@ -36,10 +38,13 @@ def create_vocab_util_from_training_set(tr_input_filename: str) -> VocabUtil:
     return VocabUtil(tr_sorted_tokens)
 
 
-def prep_validation_set(input_filename: str, nn_input_preparer: NNInputPreparer, vu: VocabUtil):
+def prep_validation_set(input_filename: str, nn_input_preparer: NNInputPreparer, vu: VocabUtil,
+                        upsample: bool):
     loader = LabeledDataLoader(input_filename)
     labeled_tweets = loader.parse_tokens_and_labels(loader.load_lines())
     labeled_tweets = nn_input_preparer.filter_out_long_tweets(labeled_tweets)
+    if upsample:
+        labeled_tweets = nn_input_preparer.crude_upsample(labeled_tweets)
     irregular_inputs = [[vu.nn_input_token_to_int[token]
                          if token in vu.nn_input_token_to_int
                          else vu.nn_input_token_to_int['<OOV>']
@@ -63,6 +68,8 @@ def main_training():
     nn_input_preparer = NNInputPreparer(vu, MAX_SEQ_LEN)
 
     tr_labeled_tweets = nn_input_preparer.filter_out_long_tweets(tr_labeled_tweets)
+    if UPSAMPLE:
+        tr_labeled_tweets = nn_input_preparer.crude_upsample(tr_labeled_tweets)
     tr_irregular_inputs = [[vu.nn_input_token_to_int[token]
                             if token in vu.nn_input_token_to_int
                             else vu.nn_input_token_to_int['<OOV>']
@@ -93,7 +100,7 @@ def main_training():
                                  save_best_only=False)
 
     dev_rectangular_inputs, dev_rectangular_targets, dev_targets_one_hot_encoded = \
-        prep_validation_set(DEV_INPUT_FILENAME, nn_input_preparer, vu)
+        prep_validation_set(DEV_INPUT_FILENAME, nn_input_preparer, vu, UPSAMPLE)
 
     print(f'Validating on {len(dev_rectangular_inputs)} dev tweets, each no longer than {MAX_SEQ_LEN} tokens')
 
