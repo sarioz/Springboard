@@ -47,7 +47,7 @@ It is simplest (though not fastest) to clone my entire Springboard repository li
 ```
 $ mkdir sarioz
 $ cd sarioz
-$ git clone git clone https://github.com/sarioz/Springboard
+$ git clone https://github.com/sarioz/Springboard
 $ cd Springboard/Capstone-Project/SpanglishModelingFlask
 ```
 
