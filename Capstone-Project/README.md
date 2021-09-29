@@ -120,8 +120,6 @@ In order to automatically reconstruct this environment, run
 
 ```$ conda env create -f=training_environment.yml -n training-environment```
 
-/// Check that this environment works
-
 Within each of the 5 subprojects, ```main_training.py``` is the entry point for training and
 ```main_inference.py``` is the entry point for evaluating a specific model.
 
