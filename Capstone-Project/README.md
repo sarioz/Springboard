@@ -42,7 +42,7 @@ and then run
 
 If you wish to customize the web app, first pull the code into your local development environment.
 The web app is self-contained in the ```SpanglishModelingFlask/``` directory.
-It is simplest to clone my entire Springboard repository like so:
+It is simplest (though not fastest) to clone my entire Springboard repository like so:
 
 ```
 $ mkdir sarioz
@@ -79,12 +79,13 @@ After initialization succeeds, you can hit the app using your web browser at htt
 ## Build and Push Docker Image
 
 To containerize your web app,
-run the following from the ```SpanglishModelingFlask/``` directory:
+first create a [Docker Hub](https://hub.docker.com/) account and note your username.
+Next, run the following from the ```SpanglishModelingFlask/``` directory:
 
 ```$ docker build -t yourdockerhubusername/spanglish-modeling-app:latest .```
 
 This takes approximately 6 minutes on my mid-2015 Macbook Pro (on *my* latest version).
-Then you may push the built Docker image to [Docker Hub](https://hub.docker.com/) using
+Then you may push the built Docker image to Docker Hub using
 
 ```$ docker image push -a yourdockerhubusername/spanglish-modeling-app```
 
@@ -96,7 +97,7 @@ making sure to change `sarioz` to `yourdockerhubusername`.
 To replicate the
 [project results](https://docs.google.com/spreadsheets/d/1PwbSxT5r1alqZVMPIM7L0D00pduHuVTRr8YP8eLYMAs/edit?usp=sharing)
 or tweak the training algorithms, step into
-```Capstone-Project/``` then descend into any of the respective 5 subdirectories:
+```Capstone-Project/``` then descend into any of the 5 subdirectories:
 ```POSTagger-RNN```, ```POSTagger-BERT```, ```SA-RNN```, ```SA-BERT```, or ```SA-Lexicon```.
 The ones chosen for the web app are ```POSTagger-RNN``` and ```SA-RNN```.
 
