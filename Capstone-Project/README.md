@@ -5,11 +5,13 @@ If something in any section is puzzling, make sure you have read the previous se
 
 ## Use
 
-To use the Spanglish Modeling web app, click [here](http://ec2-18-217-148-222.us-east-2.compute.amazonaws.com/).
+The EC2 instance hosting the service has been terminated.
+<!---
 You may enter any tweet-like text in English, Spanish, or a mixture of the two.
 This web app bundles a Part-of-Speech Tagger together with a Sentiment Analyzer.
 This service is free to use but comes with absolutely no guarantee of anything like availability or correctness.
 Please don't hit it with robots (if you don't know what this means, you're fine).
+-->
 
 ## Deploy
 
